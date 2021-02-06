@@ -2,13 +2,30 @@
 
 package com.isyscore.kotlin.common
 
-
 import org.apache.commons.compress.archivers.zip.Zip64Mode
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.io.IOUtils
 import java.io.*
+import java.util.zip.ZipFile
+
+object ZipUtil {
+
+    fun readFromZip(zipPath: String, innerPath: String): ByteArray? = readFromZip(File(zipPath), innerPath)
+
+    fun readFromZip(zipFile: File, innerPath: String): ByteArray? {
+        val zip = ZipFile(zipFile)
+        val entry = zip.getEntry(innerPath) ?: return null
+        return zip.getInputStream(entry).use { it.readBytes() }
+    }
+
+    fun readStringFromZip(zipPath: String, innerPath: String): String? = readStringFromZip(File(zipPath), innerPath)
+
+    fun readStringFromZip(zipFile: File, innerPath: String): String? = readFromZip(zipFile, innerPath)?.let { String(it) }
+
+}
+
 
 class ZipUtils {
 

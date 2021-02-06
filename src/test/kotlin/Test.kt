@@ -1,7 +1,5 @@
 
-import com.isyscore.kotlin.common.HttpMethod
-import com.isyscore.kotlin.common.http
-import com.isyscore.kotlin.common.join
+import com.isyscore.kotlin.common.*
 import com.isyscore.kotlin.common.json.JSONObject
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -50,14 +48,32 @@ inline fun<reified T> newInstance(): T {
 class Test {
 
     @Test
+    fun testMR() {
+        val ia = arrayOf(1, 2, 3, 4, 5)
+        val s = ia.map { "$it" }.reduce { acc, s -> acc + s }
+        println(s)
+    }
+
+    @Test
     fun check() {
 
+
+        runCommand {
+            commands.add("")
+            commands.addAll(listOf())
+        }.run { output join error }
         val (a, b, c, d) = 1 join 2 join 3 join 4 join 5 join 6
         println(a)
         println(b)
         println(c)
         println(d)
 
+    }
+
+    @Test
+    fun httpTest() {
+        val ret = httpGet("https://devapi.heweather.net/v7/weather/3d?location=101210101&key=338e3ef0ebf54d8580c0b1043ec5bcef")
+        println(ret)
     }
 
     @Test
@@ -103,6 +119,26 @@ class Test {
             }
             onFail {
                 println("fail: $it")
+            }
+        }
+    }
+
+
+    @Test
+    fun testIstio() {
+        http {
+            url = "http://10.211.55.16:10000/session"
+            method = HttpMethod.GET
+            headers["Accept"] = "*/*"
+            headers["Content-Type"] = "text/plain;charset=UTF-8"
+            headers["Accept-Encoding"] = "plain"
+            onSuccess { code, text, headers, cookie ->
+                println("resp: $code")
+                println("text: $text")
+            }
+            onFail {
+                println("ERROR")
+                println(it)
             }
         }
     }

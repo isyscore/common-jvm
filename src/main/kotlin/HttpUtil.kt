@@ -154,6 +154,7 @@ private object HttpOperations {
             .followRedirects(util.followRedirects)
             .followSslRedirects(util.followRedirects)
             .proxy(util.proxy)
+
         if (util.isHttps) {
             val trust = object : X509TrustManager {
                 override fun checkClientTrusted(p0: Array<out X509Certificate>?, p1: String?) {}
@@ -167,9 +168,9 @@ private object HttpOperations {
         var ret: String? = null
         try {
             val resp = call.execute()
+            val headers = (resp.headers + (resp.networkResponse?.headers ?: Headers.headersOf()) + (resp.priorResponse?.headers ?: Headers.headersOf())).toSet().toMap()
+            val cookies = (resp.headers.toCookies(req) + (resp.networkResponse?.headers?.toCookies(req) ?: listOf()) + (resp.priorResponse?.headers?.toCookies(req) ?: listOf())).toSet()
             if (resp.isSuccessful || resp.isRedirect) {
-                val headers = (resp.headers + (resp.networkResponse?.headers ?: Headers.headersOf()) + (resp.priorResponse?.headers ?: Headers.headersOf())).toSet().toMap()
-                val cookies = (resp.headers.toCookies(req) + (resp.networkResponse?.headers?.toCookies(req) ?: listOf()) + (resp.priorResponse?.headers?.toCookies(req) ?: listOf())).toSet()
                 if (util.isReturnBytes) {
                     val retBytes = resp.body?.bytes()
                     if (retBytes != null) ret = String(retBytes)
@@ -178,6 +179,8 @@ private object HttpOperations {
                     ret = resp.body?.string()
                     util._success(resp.code, ret, headers, cookies)
                 }
+            } else {
+                util._success(resp.code, null, headers, cookies)
             }
         } catch (e: Throwable) {
             util._fail(e)
