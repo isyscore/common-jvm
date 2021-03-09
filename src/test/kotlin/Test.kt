@@ -1,6 +1,7 @@
 
 import com.isyscore.kotlin.common.*
 import com.isyscore.kotlin.common.json.JSONObject
+import java.lang.reflect.Method
 import java.net.InetSocketAddress
 import java.net.Proxy
 import kotlin.contracts.InvocationKind
@@ -124,6 +125,16 @@ class Test {
     }
 
 
+    var parameterInfo: MutableMap<String, Any?>? = null
+
+    fun enter(className: String?, method: Method, args: Array<Any?>) {
+        if (method.name == "setRequestProperty" || method.name == "addRequestProperty") {
+            (parameterInfo ?: mutableMapOf()).putAll(collectParameters(method, args))
+        }
+    }
+
+    fun collectParameters(method: Method, args: Array<Any?>): MutableMap<String, Any?>  = method.parameters.mapIndexed { i, p -> p.name to args[i] }.toMap().toMutableMap()
+
     @Test
     fun testIstio() {
         http {
@@ -141,6 +152,30 @@ class Test {
                 println(it)
             }
         }
+    }
+
+    @Test
+    fun testReqLic() {
+        http {
+            url = "http://0.0.0.0:9900/clientInfo"
+            method = HttpMethod.POST
+            mimeType = "application/json"
+            data = """{"code":"b66be662-2e0c-487b-ba8a-609e6b94815e", "email":"hexj@isyscore.com"}"""
+            onSuccess { code, text, headers, cookie ->
+                println("ret => $text")
+            }
+            onFail {
+                println("fail => $it")
+            }
+        }
+    }
+
+
+    @Test
+    fun testKt() {
+        val list = (0..99).toList()
+        val str = list.map { "$it" }.reduce { acc, s -> "$acc:$s" }
+        println(str)
     }
 
 }
