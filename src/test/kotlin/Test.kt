@@ -58,7 +58,6 @@ class Test {
     @Test
     fun check() {
 
-
         runCommand {
             commands.add("")
             commands.addAll(listOf())

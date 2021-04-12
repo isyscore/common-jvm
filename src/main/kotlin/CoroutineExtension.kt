@@ -1,15 +1,13 @@
 package com.isyscore.kotlin.common
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 @DslMarker
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPEALIAS, AnnotationTarget.TYPE, AnnotationTarget.FUNCTION)
 annotation class KtDsl
 
 @KtDsl
-fun go(vararg params: Any?, block: suspend (params: Array<*>) -> Unit) {
-    GlobalScope.launch {
-        block(params)
-    }
-}
+fun go(block: suspend CoroutineScope.() -> Unit): Job = GlobalScope.launch { block() }
+
+@KtDsl
+fun<T> async(block: suspend CoroutineScope.() -> T): Deferred<T> = GlobalScope.async { block() }
