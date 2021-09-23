@@ -1,13 +1,26 @@
 
 import com.isyscore.kotlin.common.*
 import com.isyscore.kotlin.common.json.JSONObject
+import org.junit.Test
 import java.lang.reflect.Method
 import java.net.InetSocketAddress
 import java.net.Proxy
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
+import java.security.MessageDigest
 import kotlin.math.ceil
-import kotlin.test.Test
+
+
+class Sample {
+    lateinit var list: MutableList<String>
+
+    infix fun and(a: String): Sample {
+        if (!this::list.isInitialized) {
+            this.list = mutableListOf()
+        }
+        list.add(a)
+        return this
+    }
+}
+
 
 const val json = """
 {
@@ -26,6 +39,11 @@ data class JsonClass(val str: String, val int: Int, val obj: String, val array: 
     companion object
 }
 
+fun String.md5(): String {
+    val ba = MessageDigest.getInstance("MD5").digest(this.toByteArray())
+    return ba.map { (it.toInt() and 0xFF).toString().padStart(2, '0') }.reduce { acc, s -> acc + s }
+}
+
 fun JsonClass.Companion.fromString(str: String): JsonClass =
     JSONObject(str).run {
         JsonClass(
@@ -40,20 +58,27 @@ fun JsonClass.Companion.fromString(str: String): JsonClass =
     }
 
 inline fun<reified T> newInstance(): T {
+
     val clz = T::class.java
     val mCreate = clz.getDeclaredConstructor()
     mCreate. isAccessible = true
     return mCreate. newInstance()
 }
 
-class Test {
+data class MyJsonClass(
+    val str1: String,
+    val str2: String
+)
+
+class TestCase {
 
     @Test
-    fun testMR() {
-        val ia = arrayOf(1, 2, 3, 4, 5)
-        val s = ia.map { "$it" }.reduce { acc, s -> acc + s }
-        println(s)
+    fun testSample() {
+        val sample = Sample()
+        sample and "aaa"
+        println(sample.list)
     }
+
 
     @Test
     fun check() {
@@ -114,7 +139,7 @@ class Test {
             url = "http://www.baidu.com"
             method = HttpMethod.GET
             proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress("localhost", 8888))
-            onSuccess { code, text, headers, cookie ->
+            onSuccess { _, text, _, _ ->
                 println(text)
             }
             onFail {
@@ -160,7 +185,7 @@ class Test {
             method = HttpMethod.POST
             mimeType = "application/json"
             data = """{"code":"b66be662-2e0c-487b-ba8a-609e6b94815e", "email":"hexj@isyscore.com"}"""
-            onSuccess { code, text, headers, cookie ->
+            onSuccess { _, text, _, _ ->
                 println("ret => $text")
             }
             onFail {
@@ -178,6 +203,8 @@ class Test {
     }
 
 }
+
+
 
 
 const val JSON = """

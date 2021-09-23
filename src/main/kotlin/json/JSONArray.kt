@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "DuplicatedCode", "SameParameterValue")
+
 package com.isyscore.kotlin.common.json
 
 import java.io.IOException
@@ -20,7 +22,7 @@ class JSONArray : Iterable<Any?> {
     constructor(x: JSONTokener) : this() {
         if (x.nextClean() != '[') throw x.syntaxError("A JSONArray text must start with '['")
         var nextChar = x.nextClean()
-        if (nextChar.toInt() == 0) throw x.syntaxError("Expected a ',' or ']'")
+        if (nextChar.code == 0) throw x.syntaxError("Expected a ',' or ']'")
         if (nextChar != ']') {
             x.back()
             while (true) {
@@ -35,7 +37,7 @@ class JSONArray : Iterable<Any?> {
                     0.toChar() -> throw x.syntaxError("Expected a ',' or ']'")
                     ',' -> {
                         nextChar = x.nextClean()
-                        if (nextChar.toInt() == 0) throw x.syntaxError("Expected a ',' or ']'")
+                        if (nextChar.code == 0) throw x.syntaxError("Expected a ',' or ']'")
                         if (nextChar == ']') return
                         x.back()
                     }
@@ -402,7 +404,7 @@ class JSONArray : Iterable<Any?> {
         return try {
             var needsComma = false
             val length = length()
-            writer.write('['.toInt())
+            writer.write('['.code)
             if (length == 1) {
                 try {
                     JSONObject.writeValue(writer, myArrayList[0], indentFactor, indent)
@@ -413,8 +415,8 @@ class JSONArray : Iterable<Any?> {
                 val newIndent = indent + indentFactor
                 var i = 0
                 while (i < length) {
-                    if (needsComma) writer.write(','.toInt())
-                    if (indentFactor > 0) writer.write('\n'.toInt())
+                    if (needsComma) writer.write(','.code)
+                    if (indentFactor > 0) writer.write('\n'.code)
                     JSONObject.indent(writer, newIndent)
                     try {
                         JSONObject.writeValue(writer, myArrayList[i], indentFactor, newIndent)
@@ -424,10 +426,10 @@ class JSONArray : Iterable<Any?> {
                     needsComma = true
                     i += 1
                 }
-                if (indentFactor > 0) writer.write('\n'.toInt())
+                if (indentFactor > 0) writer.write('\n'.code)
                 JSONObject.indent(writer, indent)
             }
-            writer.write(']'.toInt())
+            writer.write(']'.code)
             writer
         } catch (e: IOException) {
             throw JSONException(e)

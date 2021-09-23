@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package com.isyscore.kotlin.common.json
 
 import java.io.*
@@ -60,7 +62,7 @@ open class JSONTokener(reader: Reader) {
     operator fun next(): Char {
         val c = if (usePrevious) {
             usePrevious = false
-            previous.toInt()
+            previous.code
         } else {
             try {
                 reader.read()
@@ -81,12 +83,12 @@ open class JSONTokener(reader: Reader) {
         if (c > 0) {
             index++
             when (c) {
-                '\r'.toInt() -> {
+                '\r'.code -> {
                     line++
                     characterPreviousLine = character
                     character = 0
                 }
-                '\n'.toInt() -> {
+                '\n'.code -> {
                     if (previous != '\r') {
                         line++
                         characterPreviousLine = character
@@ -102,7 +104,7 @@ open class JSONTokener(reader: Reader) {
     fun next(c: Char): Char {
         val n = this.next()
         if (n != c) {
-            if (n.toInt() > 0) throw this.syntaxError("Expected '$c' and instead saw '$n'")
+            if (n.code > 0) throw this.syntaxError("Expected '$c' and instead saw '$n'")
             throw this.syntaxError("Expected '$c' and instead saw ''")
         }
         return n
@@ -125,7 +127,7 @@ open class JSONTokener(reader: Reader) {
     fun nextClean(): Char {
         while (true) {
             val c = this.next()
-            if (c.toInt() == 0 || c > ' ') return c
+            if (c.code == 0 || c > ' ') return c
         }
     }
 
@@ -167,8 +169,8 @@ open class JSONTokener(reader: Reader) {
         val sb = StringBuilder()
         while (true) {
             val c = this.next()
-            if (c == delimiter || c.toInt() == 0 || c == '\n' || c == '\r') {
-                if (c.toInt() != 0) back()
+            if (c == delimiter || c.code == 0 || c == '\n' || c == '\r') {
+                if (c.code != 0) back()
                 return sb.toString().trim { it <= ' ' }
             }
             sb.append(c)
@@ -181,8 +183,8 @@ open class JSONTokener(reader: Reader) {
         val sb = StringBuilder()
         while (true) {
             c = this.next()
-            if (delimiters.indexOf(c) >= 0 || c.toInt() == 0 || c == '\n' || c == '\r') {
-                if (c.toInt() != 0) back()
+            if (delimiters.indexOf(c) >= 0 || c.code == 0 || c == '\n' || c == '\r') {
+                if (c.code != 0) back()
                 return sb.toString().trim { it <= ' ' }
             }
             sb.append(c)
@@ -190,7 +192,7 @@ open class JSONTokener(reader: Reader) {
     }
 
     @Throws(JSONException::class)
-    fun nextValue(): Any? {
+    fun nextValue(): Any {
         var c = nextClean()
         val string: String
         when (c) {
@@ -225,7 +227,7 @@ open class JSONTokener(reader: Reader) {
             reader.mark(1000000)
             do {
                 c = this.next()
-                if (c.toInt() == 0) {
+                if (c.code == 0) {
                     reader.reset()
                     index = startIndex
                     character = startCharacter
@@ -249,8 +251,8 @@ open class JSONTokener(reader: Reader) {
     companion object {
         fun dehexchar(c: Char): Int = when (c) {
             in '0'..'9' -> c - '0'
-            in 'A'..'F' -> c.toInt() - ('A'.toInt() - 10)
-            in 'a'..'f' -> c.toInt() - ('a'.toInt() - 10)
+            in 'A'..'F' -> c.code - ('A'.code - 10)
+            in 'a'..'f' -> c.code - ('a'.code - 10)
             else -> -1
         }
     }

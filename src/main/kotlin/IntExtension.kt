@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.isyscore.kotlin.common
 
 fun Int.toGridData(columns: Int = 1) = mutableListOf<List<Int>>().apply {

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.isyscore.kotlin.common.json
 
 import java.io.IOException

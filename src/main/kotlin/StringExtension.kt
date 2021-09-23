@@ -6,11 +6,13 @@ import com.isyscore.kotlin.common.json.JSONObject
 import java.io.File
 import java.nio.charset.Charset
 import java.security.MessageDigest
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 fun String.decodeURLPart(start: Int = 0, end: Int = length, charset: Charset = Charsets.UTF_8): String = decodeScan(start, end, false, charset)
 
 fun String.toJsonEncoded() = this.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"")
-fun String.toTitleUpperCase() = substring(0, 1).toUpperCase() + substring(1)
+fun String.toTitleUpperCase() = substring(0, 1).uppercase(Locale.getDefault()) + substring(1)
 
 fun String.appendPathPart(part: String) = when ((if (isNotEmpty() && this[length - 1] == '/') 1 else 0) + (if (part.isNotEmpty() && part[0] == '/') 1 else 0)) {
     2 -> this + part.removePrefix("/")
@@ -28,7 +30,7 @@ fun String.replaceTag(tag: String, block: () -> String) = replace(tag, block())
 
 fun String.skipEmptyLine() = lines().filterNot { it.trim() == "" }.joinToString("\n")
 
-fun String.toMap() = split("&").map { s -> s.indexOf("=").let { i -> Pair(s.substring(0, i), s.substring(i + 1)) } }.toMap()
+fun String.toMap() = split("&").associate { s -> s.indexOf("=").let { i -> Pair(s.substring(0, i), s.substring(i + 1)) } }
 
 fun String.jsonToMap() = linkedMapOf<String, Any>().apply {
     try {
@@ -40,10 +42,10 @@ fun String.jsonToMap() = linkedMapOf<String, Any>().apply {
     }
 }.toMap()
 
-fun String.toCookieMap() = split(";").map { it.trim() }.map {
+fun String.toCookieMap() = split(";").map { it.trim() }.associate {
     val kv = it.split("=")
     Pair<String, Any>(kv[0].trim(), kv[1].trim())
-}.toMap()
+}
 
 fun String.toPair(): Pair<String, String> {
     val p = this.split("=").map { it.trim() }

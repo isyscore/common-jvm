@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package com.isyscore.kotlin.common
 
 import java.io.File

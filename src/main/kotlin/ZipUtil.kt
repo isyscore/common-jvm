@@ -1,4 +1,4 @@
-@file:Suppress("unused", "PropertyName", "DuplicatedCode")
+@file:Suppress("unused", "PropertyName", "DuplicatedCode", "MemberVisibilityCanBePrivate")
 
 package com.isyscore.kotlin.common
 
@@ -6,7 +6,7 @@ import org.apache.commons.compress.archivers.zip.Zip64Mode
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.IOUtil
 import java.io.*
 import java.util.zip.ZipFile
 
@@ -96,7 +96,7 @@ private object ZipOperations {
             zaos.putArchiveEntry(zipEntry)
             if (file.isDirectory) continue
             val bis = BufferedInputStream(FileInputStream(file))
-            IOUtils.copy(bis, zaos)
+            IOUtil.copy(bis, zaos)
             zaos.closeArchiveEntry()
             bis.close()
             current++
@@ -138,7 +138,7 @@ private object ZipOperations {
                     entryFile.mkdirs()
                 } else {
                     val bos = BufferedOutputStream(FileOutputStream(entryFile))
-                    IOUtils.copy(zais, bos)
+                    IOUtil.copy(zais, bos)
                     bos.close()
                 }
                 current++

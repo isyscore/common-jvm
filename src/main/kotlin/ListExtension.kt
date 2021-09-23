@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.isyscore.kotlin.common
 
 inline operator fun <reified T> List<T>.minus(list: List<T>) = this.filter { !list.contains(it) }.toMutableList()

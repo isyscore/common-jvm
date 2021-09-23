@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "DuplicatedCode", "SameParameterValue")
+
 package com.isyscore.kotlin.common.json
 
 import java.io.Closeable
@@ -511,13 +513,13 @@ class JSONObject {
         return try {
             var needsComma = false
             val length = length()
-            writer.write('{'.toInt())
+            writer.write('{'.code)
             if (length == 1) {
                 val entry = entrySet().iterator().next()
                 val key = entry.key
                 writer.write(quote(key))
-                writer.write(':'.toInt())
-                if (indentFactor > 0) writer.write(' '.toInt())
+                writer.write(':'.code)
+                if (indentFactor > 0) writer.write(' '.code)
                 try {
                     writeValue(writer, entry.value, indentFactor, indent)
                 } catch (e: Exception) {
@@ -526,12 +528,12 @@ class JSONObject {
             } else if (length != 0) {
                 val newIndent = indent + indentFactor
                 for ((key, value) in entrySet()) {
-                    if (needsComma) writer.write(','.toInt())
-                    if (indentFactor > 0) writer.write('\n'.toInt())
+                    if (needsComma) writer.write(','.code)
+                    if (indentFactor > 0) writer.write('\n'.code)
                     indent(writer, newIndent)
                     writer.write(quote(key))
-                    writer.write(':'.toInt())
-                    if (indentFactor > 0) writer.write(' '.toInt())
+                    writer.write(':'.code)
+                    if (indentFactor > 0) writer.write(' '.code)
                     try {
                         writeValue(writer, value, indentFactor, newIndent)
                     } catch (e: Exception) {
@@ -539,10 +541,10 @@ class JSONObject {
                     }
                     needsComma = true
                 }
-                if (indentFactor > 0) writer.write('\n'.toInt())
+                if (indentFactor > 0) writer.write('\n'.code)
                 indent(writer, indent)
             }
-            writer.write('}'.toInt())
+            writer.write('}'.code)
             writer
         } catch (exception: IOException) {
             throw JSONException(exception)
@@ -657,9 +659,9 @@ class JSONObject {
             }
             if (Character.isLowerCase(key[0])) return null
             if (key.length == 1) {
-                key = key.toLowerCase(Locale.ROOT)
+                key = key.lowercase(Locale.ROOT)
             } else if (!Character.isUpperCase(key[1])) {
-                key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1)
+                key = key.substring(0, 1).lowercase(Locale.ROOT) + key.substring(1)
             }
             return key
         }
@@ -736,18 +738,18 @@ class JSONObject {
             var hhhh: String
             var i = 0
             val len = string.length
-            w.write('"'.toInt())
+            w.write('"'.code)
             while (i < len) {
                 b = c
                 c = string[i]
                 when (c) {
                     '\\', '"' -> {
-                        w.write('\\'.toInt())
-                        w.write(c.toInt())
+                        w.write('\\'.code)
+                        w.write(c.code)
                     }
                     '/' -> {
-                        if (b == '<') w.write('\\'.toInt())
-                        w.write(c.toInt())
+                        if (b == '<') w.write('\\'.code)
+                        w.write(c.code)
                     }
                     '\b' -> w.write("\\b")
                     '\t' -> w.write("\\t")
@@ -756,16 +758,16 @@ class JSONObject {
                     '\r' -> w.write("\\r")
                     else -> if (c < ' ' || c in '\u0080' until '\u00a0' || c in '\u2000' until '\u2100') {
                         w.write("\\u")
-                        hhhh = Integer.toHexString(c.toInt())
+                        hhhh = Integer.toHexString(c.code)
                         w.write("0000", 0, 4 - hhhh.length)
                         w.write(hhhh)
                     } else {
-                        w.write(c.toInt())
+                        w.write(c.code)
                     }
                 }
                 i += 1
             }
-            w.write('"'.toInt())
+            w.write('"'.code)
             return w
         }
 
@@ -887,7 +889,7 @@ class JSONObject {
         fun indent(writer: Writer, indent: Int) {
             var i = 0
             while (i < indent) {
-                writer.write(' '.toInt())
+                writer.write(' '.code)
                 i++
             }
         }

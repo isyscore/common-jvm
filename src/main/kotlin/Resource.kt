@@ -3,15 +3,15 @@
 package com.isyscore.kotlin.common
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.IOUtil
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
 object Resource {
 
-    fun read(file: String) = javaClass.getResourceAsStream("/$file").use { String(it.readBytes()) }
-    fun readBytes(file: String) = javaClass.getResourceAsStream("/$file").use { it.readBytes() }
+    fun read(file: String): String? = javaClass.getResourceAsStream("/$file").use { if (it == null) null else String(it.readBytes()) }
+    fun readBytes(file: String): ByteArray? = javaClass.getResourceAsStream("/$file").use { it?.readBytes() }
 
     fun extract(file: String, dest: String) {
         var saveFileDir = dest
@@ -34,12 +34,12 @@ object Resource {
                 entryFile.mkdirs()
             } else {
                 val bos = BufferedOutputStream(FileOutputStream(entryFile))
-                IOUtils.copy(zais, bos)
+                IOUtil.copy(zais, bos)
                 bos.close()
             }
         }
         zais.close()
-        ins.close()
+        ins?.close()
     }
 }
 
