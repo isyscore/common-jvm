@@ -58,7 +58,8 @@ class JSONObject {
             if (c != ':') throw x.syntaxError("Expected a ':' after a key")
             if (opt(key) != null) throw x.syntaxError("Duplicate key \"$key\"")
             val value = x.nextValue()
-            if (value != null) this.put(key, value)
+            // if (value != null)
+            this.put(key, value)
             when (x.nextClean()) {
                 ';', ',' -> {
                     if (x.nextClean() == '}') return

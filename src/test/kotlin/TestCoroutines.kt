@@ -4,20 +4,19 @@ import com.isyscore.kotlin.common.go
 import kotlinx.coroutines.*
 import org.junit.Test
 
-@DelicateCoroutinesApi
 class TestCoroutines {
 
     @Test
     fun test() {
 
         val startTime = System.currentTimeMillis()
-        go {
+        val (scope, job) = go {
             val ret1 = async { getResult1() }
             val ret2 = async { getResult2() }
             val ret3 = async { getResult3() }
             val ret = ret1.await() + ret2.await() + ret3.await()
             val endTime = System.currentTimeMillis()
-            println("ret = $ret, time = ${(endTime - startTime) / 1000.0}")
+            println("ret = $ret, time = ${endTime - startTime}")
             gio {
                 done = true
             }
@@ -48,22 +47,24 @@ class TestCoroutines {
 
     @Test
     fun test2() {
-        GlobalScope.launch {
+
+        go {
             try {
                 withTimeout(5000) {
-                    println("start awaiting with 5 secs timeout")
-                    GlobalScope.async {
+                    println("start awaiting with 5 secs.")
+                    async {
                         while (!done) {
-                            println("job waiting...")
+                            println("job waiting")
                             delay(500)
                         }
                     }.await()
                 }
             } catch (ex: TimeoutCancellationException) {
-                println("out of time")
+                println("timeout")
             }
             done = true
         }
+
         while (!done) {
             // wait
         }

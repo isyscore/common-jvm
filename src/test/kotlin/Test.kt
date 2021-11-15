@@ -197,7 +197,8 @@ class TestCase {
 
     @Test
     fun testKt() {
-        val list = (0..99).toList()
+        // val list = listOf(listOf("s")).flatten()
+        val list = (0..99).toList().groupBy {  }
         val str = list.map { "$it" }.reduce { acc, s -> "$acc:$s" }
         println(str)
     }
