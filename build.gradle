@@ -16,12 +16,10 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 group 'com.github.isyscore'
-version '2.0.0'
+version '2.0.1'
 
 repositories {
     mavenCentral()
-    maven { url 'https://kotlin.bintray.com/kotlinx' }
-    maven { url "https://plugins.gradle.org/m2/" }
 }
 
 dependencies {
@@ -37,12 +35,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
+sourceCompatibility = 1.8
+
 compileKotlin {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "1.8" // "17"
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "1.8" // "17"
 }
 
 task sourcesJar(type: Jar) {
@@ -64,7 +64,7 @@ publishing {
         mavenKotlin(MavenPublication) {
             groupId = "com.github.isyscore"
             artifactId = "common-jvm"
-            version = "2.0.0"
+            version = "2.0.1"
             from components.java
             artifact sourcesJar
             artifact javadocJar

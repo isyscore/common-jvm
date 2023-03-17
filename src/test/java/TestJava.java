@@ -19,4 +19,10 @@ public class TestJava {
         System.out.println(s);
     }
 
+    @Test
+    public void testPrint() {
+        System.out.println("a" + 1);
+        System.out.println(1 + "a");
+    }
+
 }

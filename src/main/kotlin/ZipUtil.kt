@@ -134,9 +134,12 @@ private object ZipOperations {
                 val entryFileName = archiveEntry.name
                 val entryFilePath = saveFileDir + entryFileName
                 val entryFile = File(entryFilePath)
-                if (entryFileName.endsWith(File.separator)) {
+                if (entryFileName.endsWith("/") || entryFileName.endsWith("\\")) {
                     entryFile.mkdirs()
                 } else {
+                    if (!entryFile.parentFile.exists()) {
+                        entryFile.parentFile.mkdirs()
+                    }
                     val bos = BufferedOutputStream(FileOutputStream(entryFile))
                     IOUtil.copy(zais, bos)
                     bos.close()

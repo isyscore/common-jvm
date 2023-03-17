@@ -1,4 +1,3 @@
-
 import com.isyscore.kotlin.common.*
 import com.isyscore.kotlin.common.json.JSONObject
 import org.junit.Test
@@ -57,12 +56,12 @@ fun JsonClass.Companion.fromString(str: String): JsonClass =
         )
     }
 
-inline fun<reified T> newInstance(): T {
+inline fun <reified T> newInstance(): T {
 
     val clz = T::class.java
     val mCreate = clz.getDeclaredConstructor()
-    mCreate. isAccessible = true
-    return mCreate. newInstance()
+    mCreate.isAccessible = true
+    return mCreate.newInstance()
 }
 
 data class MyJsonClass(
@@ -97,7 +96,8 @@ class TestCase {
 
     @Test
     fun httpTest() {
-        val ret = httpGet("https://devapi.heweather.net/v7/weather/3d?location=101210101&key=338e3ef0ebf54d8580c0b1043ec5bcef")
+        val ret =
+            httpGet("https://devapi.heweather.net/v7/weather/3d?location=101210101&key=338e3ef0ebf54d8580c0b1043ec5bcef")
         println(ret)
     }
 
@@ -122,7 +122,7 @@ class TestCase {
 
     }
 
-    fun<T, R> sample(item: T, block: T.() -> R): R = block(item)
+    fun <T, R> sample(item: T, block: T.() -> R): R = block(item)
 
     @Test
     fun call() {
@@ -157,7 +157,8 @@ class TestCase {
         }
     }
 
-    fun collectParameters(method: Method, args: Array<Any?>): MutableMap<String, Any?>  = method.parameters.mapIndexed { i, p -> p.name to args[i] }.toMap().toMutableMap()
+    fun collectParameters(method: Method, args: Array<Any?>): MutableMap<String, Any?> =
+        method.parameters.mapIndexed { i, p -> p.name to args[i] }.toMap().toMutableMap()
 
     @Test
     fun testIstio() {
@@ -198,14 +199,39 @@ class TestCase {
     @Test
     fun testKt() {
         // val list = listOf(listOf("s")).flatten()
-        val list = (0..99).toList().groupBy {  }
+        val list = (0..99).toList().groupBy { }
         val str = list.map { "$it" }.reduce { acc, s -> "$acc:$s" }
         println(str)
     }
 
+    @Test
+    fun testPrint() {
+        var str = "hello"
+        str
+    }
+
+    fun sum(a: Double, b: Double, term: (Double) -> Double, next: (Double) -> Double): Double =
+        if (a > b) 0.0 else term(a) + sum(next(a), b, term, next)
+
+    fun integral(a: Double, b: Double, term:(Double)->Double, dx: Double): Double =
+        dx * sum(a + (dx / 2.0), b, term) { x -> x + dx }
+
+
+    @Test
+    fun Test0() {
+        val cube = { x: Double -> x * x * x }
+        val p = integral(0.0, 1.0, cube, 0.01)
+        println(p)
+        val p1 = integral(0.0, 1.0, cube, 0.001)
+        println(p1)
+    }
+
+
+    @Test
+    fun testBool() {
+
+    }
 }
-
-
 
 
 const val JSON = """
