@@ -5,6 +5,7 @@ import java.lang.reflect.Method
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.MessageDigest
+import java.util.Locale
 import kotlin.math.ceil
 
 
@@ -226,11 +227,43 @@ class TestCase {
         println(p1)
     }
 
+    fun cons(x: Int, y: Int): (Int) -> Int {
+        return { m: Int ->
+            if (m == 0) x else if (m == 1) y else throw Exception("m must be 0 or 1")
+        }
+    }
+
 
     @Test
     fun testBool() {
-
+        val z = cons(1, 2)
+        println(z(0))
+        println(z(1))
     }
+
+    fun withdraw(): (Int) -> Int {
+        var balance: Int = 100
+        return { amount: Int ->
+            if (amount > balance) {
+                -1
+            } else {
+                balance -= amount
+                balance
+            }
+        }
+    }
+
+    @Test
+    fun testWithdraw() {
+        val wd = withdraw()
+        println(wd(25))
+        println(wd(25))
+        println(wd(60))
+        println(wd(15))
+    }
+
+
+
 }
 
 

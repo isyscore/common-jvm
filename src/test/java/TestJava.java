@@ -1,6 +1,8 @@
 import com.isyscore.kotlin.common.HttpUtilKt;
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class TestJava {
 
     @Test
@@ -23,6 +25,17 @@ public class TestJava {
     public void testPrint() {
         System.out.println("a" + 1);
         System.out.println(1 + "a");
+    }
+
+    public static boolean hasText(String str) {
+        return str != null && !str.isEmpty();
+    }
+
+    @Test
+    public void testStream() {
+        String key = "2333";
+        String sKey = Optional.ofNullable(key).filter(TestJava::hasText).map(s -> "*" + s + "*").orElse(null);
+        System.out.println(sKey);
     }
 
 }

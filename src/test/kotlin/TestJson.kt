@@ -3,12 +3,20 @@ import com.isyscore.kotlin.common.toJson
 import com.isyscore.kotlin.common.toObj
 import org.junit.Test
 
-data class CSample(val name: String = "sample", val field1: String = "f1", val field2: String = "f2")
+open class CSample(val name: String = "sample", val field1: String = "f1", val field2: String = "f2")
+
+// typealias Email=String
+// typealias MyEmail=Email
+
+class MySample: CSample("", "", "")
+
+
 
 class TestJson {
 
     @Test
     fun test() {
+        String
         val str = CSample().toJson()
         println(str)
 
@@ -19,6 +27,8 @@ class TestJson {
         val jobj = JSONObject(json)
         val n = jobj.getString("name")
         println(n)
+
+
     }
 
 }

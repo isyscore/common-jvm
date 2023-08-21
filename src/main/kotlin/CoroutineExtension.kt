@@ -19,7 +19,7 @@ fun go(dispatcher: CoroutineDispatcher = Dispatchers.IO, block: suspend Coroutin
 }
 
 /**
- * [全局] 切换至主协程运行，仅在 Android/Swing/JavaFX 界面操作下有效
+ * [全局] 切行，仅在 Android/S换至主协程运wing/JavaFX 界面操作下有效
  */
 @KtDsl
 fun gmain(block: suspend CoroutineScope.() -> Unit): Pair<CoroutineScope, Job> {
