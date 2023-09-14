@@ -46,12 +46,12 @@ compileTestKotlin {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = "sources"
+    // classifier = "sources"
     from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar) {
-    classifier = "javadoc"
+    // classifier = "javadoc"
     from javadoc.destinationDir
 }
 
