@@ -5,7 +5,6 @@ import java.lang.reflect.Method
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.MessageDigest
-import java.util.Locale
 import kotlin.math.ceil
 
 
@@ -182,18 +181,21 @@ class TestCase {
 
     @Test
     fun testReqLic() {
-        http {
+        val token = ""
+        val ret =http {
             url = "http://0.0.0.0:9900/clientInfo"
             method = HttpMethod.POST
             mimeType = "application/json"
-            data = """{"code":"b66be662-2e0c-487b-ba8a-609e6b94815e", "email":"hexj@isyscore.com"}"""
+            data = """{"code":"b66be662-2e0c-487b-ba8a-609e6b94815e", "email":"hexj@isyscore.com"}$token"""
             onSuccess { _, text, _, _ ->
                 println("ret => $text")
+
             }
             onFail {
                 println("fail => $it")
             }
         }
+
     }
 
 

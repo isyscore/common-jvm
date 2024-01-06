@@ -82,7 +82,7 @@ private object ZipOperations {
 
     @Throws(Exception::class)
     fun compressFiles(files: Array<String>?, z: ZipUtils) {
-        if (files == null || files.isEmpty()) {
+        if (files.isNullOrEmpty()) {
             return
         }
         val zipFile = File(z.zipPath)

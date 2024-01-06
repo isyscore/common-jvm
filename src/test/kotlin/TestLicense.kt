@@ -19,4 +19,11 @@ class TestLicense {
         val v0 = vec[0]
         vec[1] = 1
     }
+
+    @Test
+    fun test1() {
+        val list1 = listOf(1,2,3,4,5)
+        val list2 = list1 - listOf(2,3,4)
+        println(list2)
+    }
 }

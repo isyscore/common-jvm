@@ -2,7 +2,6 @@
 
 package com.isyscore.kotlin.common
 
-import com.google.gson.Gson
 import com.isyscore.kotlin.common.json.JSONArray
 import com.isyscore.kotlin.common.json.JSONObject
 
@@ -50,5 +49,3 @@ fun JSONArray.isEveryStringContainedBy(str: String): Boolean {
     return hitCount == this.length()
 }
 
-inline fun<reified T> T.toJson(): String = Gson().toJson(this)
-inline fun<reified T> String.toObj(): T = Gson().fromJson(this, T::class.java)

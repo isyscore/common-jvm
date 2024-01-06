@@ -76,7 +76,7 @@ private object CommandOperations {
                     try {
                         process.exitValue()
                         break
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                     }
                 }
                 if (System.currentTimeMillis() - start > timeout) {
@@ -85,7 +85,7 @@ private object CommandOperations {
                 }
                 try {
                     TimeUnit.MILLISECONDS.sleep(500)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
 
             }
@@ -103,7 +103,7 @@ private object CommandOperations {
             if (process != null) {
                 try {
                     process.destroy()
-                } catch (e: Throwable) {
+                } catch (_: Throwable) {
 
                 }
             }

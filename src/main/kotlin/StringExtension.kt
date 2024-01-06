@@ -38,7 +38,7 @@ fun String.jsonToMap() = linkedMapOf<String, Any>().apply {
         j.keys().forEach { k ->
             this[k] = j[k]
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
     }
 }.toMap()
 

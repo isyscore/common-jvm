@@ -1,5 +1,4 @@
 
-import com.isyscore.kotlin.common.go
 import org.junit.Test
 import kotlin.concurrent.thread
 import kotlin.math.abs
