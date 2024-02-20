@@ -2,6 +2,7 @@
 import com.isyscore.kotlin.common.gio
 import com.isyscore.kotlin.common.go
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
 import org.junit.Test
 
 class TestCoroutines {
@@ -22,6 +23,11 @@ class TestCoroutines {
 
         while (!done) {
             // wait
+        }
+
+        flow<String> {
+
+
         }
     }
 
