@@ -1,11 +1,64 @@
 
-import com.isyscore.kotlin.common.gio
 import com.isyscore.kotlin.common.go
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
 import org.junit.Test
+import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.isAccessible
 
 class TestCoroutines {
+
+    @Test
+    fun test0() {
+        runBlocking {
+            val t1 = System.currentTimeMillis()
+            val r1 = TestObj.gInvokeSuspend<Int>("over")
+            val r2 = TestObj.gInvokeSuspend<Int>("over", 2)
+            val r3 = TestObj.gInvokeSuspend<Int>("over", 2, 4)
+            val t2 = System.currentTimeMillis()
+            println(r1)
+            println(r2)
+            println(r3)
+            println(t2 - t1)
+        }
+    }
+
+    @Test
+    fun test1() {
+        runBlocking {
+            val t1 = System.currentTimeMillis()
+            val jobs = (1..6).map { async { TestObj.gInvokeSuspend<Int>("api$it") } }
+            jobs.sumOf { it.await()!! }
+
+            val r1a = async { TestObj.gInvokeSuspend<Int>("over") }
+            val r2a = async { TestObj.gInvokeSuspend<Int>("over", 2) }
+            val r3a = async { TestObj.gInvokeSuspend<Int>("over", 2, 4) }
+            val r1 = r1a.await()
+            val r2 = r2a.await()
+            val r3 = r3a.await()
+            val t2 = System.currentTimeMillis()
+            println(r1)
+            println(r2)
+            println(r3)
+            println(t2 - t1)
+        }
+    }
+
+    suspend fun<T> Any.gInvokeSuspend(name: String, vararg params: Any): T? {
+        val pparam = params.map { it::class.qualifiedName ?: "kotlin.Any" }
+        val func = this::class.declaredFunctions.firstOrNull { f ->
+            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString()} == pparam
+        }?.apply { isAccessible = true } ?: return null
+        return func.callSuspend(this, *params) as? T
+    }
+
+    suspend fun Any.iInvokeSuspend(name: String, vararg params: Any): Any? {
+        val pparam = params.map { it::class.qualifiedName ?: "kotlin.Any" }
+        val func = this::class.declaredFunctions.firstOrNull { f ->
+            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString()} == pparam
+        }?.apply { isAccessible = true } ?: return null
+        return func.callSuspend(this, *params)
+    }
 
     @Test
     fun test() {
@@ -23,11 +76,6 @@ class TestCoroutines {
 
         while (!done) {
             // wait
-        }
-
-        flow<String> {
-
-
         }
     }
 
@@ -73,6 +121,5 @@ class TestCoroutines {
             // wait
         }
     }
-
 
 }

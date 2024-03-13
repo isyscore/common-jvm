@@ -16,7 +16,7 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 group 'com.github.isyscore'
-version '2.2.2.3'
+version '2.2.3.0'
 
 repositories {
     mavenCentral()
@@ -24,8 +24,9 @@ repositories {
 
 dependencies {
     api 'com.squareup.okhttp3:okhttp:4.12.0'
+    api "com.squareup.okio:okio-jvm:3.7.0"
     api 'commons-io:commons-io:20030203.000550'
-    api 'org.apache.commons:commons-compress:1.24.0'
+    api 'org.apache.commons:commons-compress:1.26.1'
     api 'org.apache.commons:commons-lang3:3.13.0'
     api 'org.jsoup:jsoup:1.16.1'
     api 'com.google.code.gson:gson:2.10.1'
@@ -33,6 +34,7 @@ dependencies {
     api "org.ktorm:ktorm-core:3.6.0"
     api "org.ktorm:ktorm-jackson:3.6.0"
     api "com.fasterxml.jackson.core:jackson-databind:2.15.3"
+    api "com.squareup.okhttp3:okhttp-sse:4.12.0"
     testImplementation 'junit:junit:4.13.2'
 }
 
@@ -65,7 +67,7 @@ publishing {
         mavenKotlin(MavenPublication) {
             groupId = "com.github.isyscore"
             artifactId = "common-jvm"
-            version = "2.2.2.3"
+            version = "2.2.3.0"
             from components.java
             artifact sourcesJar
             artifact javadocJar
