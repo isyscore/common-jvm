@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.Serializable
 import java.net.Proxy
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
@@ -63,12 +64,95 @@ fun http(init: HttpUtils.() -> Unit): String? {
     return HttpOperations.executeForResult(req, h)
 }
 
-fun httpGet(u: String) = http { url = u }
+data class HttpResponse(
+    var code: Int = 200,
+    var header: Map<String, String> = mapOf(),
+    var body: String = "",
+    var cookie: Set<Cookie>? = setOf(),
+    var error: Throwable? = null)
 
-fun httpPost(u: String, p: Map<String, String>) = http {
-    url = u
-    postParam = p.toMutableMap()
-    method = HttpMethod.POST
+fun httpGet(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
+    val resp =  HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.GET
+        getParam = paramMap?.map { "${it.key}=${it.value}" }?.joinToString("&") ?: ""
+        if (header != null) headers.putAll(header)
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Serializable? = null): HttpResponse {
+    val resp =  HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.POST
+        if (paramMap != null) postParam.putAll(paramMap)
+        if (header != null) headers.putAll(header)
+        mimeType = "application/json"
+        data = body.toJson()
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Serializable? = null): HttpResponse {
+    val resp =  HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.PUT
+        if (paramMap != null) postParam.putAll(paramMap)
+        if (header != null) headers.putAll(header)
+        mimeType = "application/json"
+        data = body.toJson()
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+fun httpDelete(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
+    val resp =  HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.DELETE
+        getParam = paramMap?.map { "${it.key}=${it.value}" }?.joinToString("&") ?: ""
+        if (header != null) headers.putAll(header)
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
 }
 
 private object HttpOperations {
