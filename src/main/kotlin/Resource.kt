@@ -3,7 +3,7 @@
 package com.isyscore.kotlin.common
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
-import org.apache.commons.io.IOUtil
+import org.apache.commons.io.IOUtils
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -34,7 +34,7 @@ object Resource {
                 entryFile.mkdirs()
             } else {
                 val bos = BufferedOutputStream(FileOutputStream(entryFile))
-                IOUtil.copy(zais, bos)
+                IOUtils.copy(zais, bos)
                 bos.close()
             }
         }

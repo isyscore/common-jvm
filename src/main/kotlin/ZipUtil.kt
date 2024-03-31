@@ -6,7 +6,7 @@ import org.apache.commons.compress.archivers.zip.Zip64Mode
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
-import org.apache.commons.io.IOUtil
+import org.apache.commons.io.IOUtils
 import java.io.*
 import java.util.zip.ZipFile
 
@@ -96,7 +96,7 @@ private object ZipOperations {
             zaos.putArchiveEntry(zipEntry)
             if (file.isDirectory) continue
             val bis = BufferedInputStream(FileInputStream(file))
-            IOUtil.copy(bis, zaos)
+            IOUtils.copy(bis, zaos)
             zaos.closeArchiveEntry()
             bis.close()
             current++
@@ -141,7 +141,7 @@ private object ZipOperations {
                         entryFile.parentFile.mkdirs()
                     }
                     val bos = BufferedOutputStream(FileOutputStream(entryFile))
-                    IOUtil.copy(zais, bos)
+                    IOUtils.copy(zais, bos)
                     bos.close()
                 }
                 current++
