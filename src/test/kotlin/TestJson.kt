@@ -1,5 +1,3 @@
-import com.isyscore.kotlin.common.HttpMethod
-import com.isyscore.kotlin.common.http
 import com.isyscore.kotlin.common.json.JSONArray
 import com.isyscore.kotlin.common.json.JSONObject
 import com.isyscore.kotlin.common.toJson
@@ -25,13 +23,6 @@ class TestJson {
         val json = """{"name":"sample2","field1":"f166","field2":"f266"}"""
         val o = json.toObj<CSample>()
         println(o)
-
-        val jobj = JSONObject(json)
-        val n = jobj.getString("name")
-        val arr = jobj.getJSONObject("data").getJSONArray("data")
-        val oo = arr[0] as JSONObject
-
-        println(n)
 
 
     }

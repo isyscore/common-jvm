@@ -266,6 +266,11 @@ private object HttpOperations {
             } else {
                 util._success(resp.code, null, headers, cookies)
             }
+            try {
+                resp.body?.close()
+            } catch (_: Exception) {
+
+            }
         } catch (e: Throwable) {
             util._fail(e)
         }
