@@ -21,7 +21,6 @@ import org.ktorm.jackson.KtormModule
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 lateinit var objMapper: ObjectMapper
 
@@ -60,6 +59,7 @@ private fun initJacksonMapper() {
         })
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
         enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+        deactivateDefaultTyping()
     }
 }
 

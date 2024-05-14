@@ -43,8 +43,6 @@ class TestJson {
         val ja = JSONArray(json)
         val m: List<Map<String, Any?>> = ja.map { (it as JSONObject).toMap() }
         println(m)
-
-
     }
 
 
