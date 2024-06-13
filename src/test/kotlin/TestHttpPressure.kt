@@ -39,4 +39,15 @@ class TestHttpPressure {
         }
     }
 
+
+    @Test
+    fun testDeckList() {
+        val jsonRet = http {
+            url = "https://0.0.0.0:38443/api/mdpro3/deck/list/lite?size=1000&keyWord=&contributor=&sortLike=true&sortRank=false"
+            method = HttpMethod.GET
+            headers["ReqSource"] = "MDPro3"
+        } ?: "{}"
+        println(jsonRet)
+    }
+
 }

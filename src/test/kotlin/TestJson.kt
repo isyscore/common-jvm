@@ -1,5 +1,8 @@
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.isyscore.kotlin.common.json.JSONArray
 import com.isyscore.kotlin.common.json.JSONObject
+import com.isyscore.kotlin.common.json.JSONPropertyIgnore
+import com.isyscore.kotlin.common.json.JSONPropertyName
 import com.isyscore.kotlin.common.toJson
 import com.isyscore.kotlin.common.toObj
 import org.junit.Test
@@ -46,7 +49,21 @@ class TestJson {
     }
 
 
+    @Test
+    fun test3() {
+        val json = """{'user_name':'hxj','age': 40}"""
+        val u = json.toObj<SampleAssign>()
+        println(u)
+
+        println(u.toJson())
+    }
+
+
+
 }
 
 
-data class SampleAssign(var user_name: String = "", var user_age: Int = 0)
+data class SampleAssign(
+    var user_name: String = "",
+    @JsonProperty("age")
+    var user_age: Int = 0)
