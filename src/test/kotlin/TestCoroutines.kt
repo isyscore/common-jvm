@@ -1,6 +1,7 @@
 
 import com.isyscore.kotlin.common.go
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.junit.Test
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.declaredFunctions
@@ -33,9 +34,13 @@ class TestCoroutines {
             val r1a = async { TestObj.gInvokeSuspend<Int>("over") }
             val r2a = async { TestObj.gInvokeSuspend<Int>("over", 2) }
             val r3a = async { TestObj.gInvokeSuspend<Int>("over", 2, 4) }
+            listOf<Deferred<Int?>>().awaitAll()
             val r1 = r1a.await()
             val r2 = r2a.await()
             val r3 = r3a.await()
+
+            "".format()
+
             val t2 = System.currentTimeMillis()
             println(r1)
             println(r2)
@@ -68,6 +73,7 @@ class TestCoroutines {
             val ret1 = async { getResult1() }
             val ret2 = async { getResult2() }
             val ret3 = async { getResult3() }
+            ret1.cancel()
             val ret = ret1.await() + ret2.await() + ret3.await()
             val endTime = System.currentTimeMillis()
             println("ret = $ret, time = ${endTime - startTime}")
@@ -122,4 +128,36 @@ class TestCoroutines {
         }
     }
 
+    @Test
+    fun test3() {
+        runBlocking {
+            val seq = sequence {
+                log("yield 1,2,3")
+                yieldAll(listOf(1, 2, 3))
+                log("yield 4,5,6")
+                yieldAll(listOf(4, 5, 6))
+                log("yield 7,8,9")
+                yieldAll(listOf(7, 8, 9))
+            }
+            val ss = seq.take(5)
+            ss.forEach { println(it) }
+        }
+    }
+
+    @Test
+    fun test4(){
+        val apis = listOf(::api1, ::api2, ::api3)
+        runBlocking {
+            val list = apis.map { api -> async { api() } }.awaitAll()
+            list.sum()
+        }
+    }
+
 }
+
+fun api1(): Int = 0
+fun api2(): Int = 0
+fun api3(): Int = 0
+
+fun log(msg: String): Unit = println(msg)
+fun log(msg: Int): Unit = println(msg)

@@ -6,6 +6,16 @@ import java.io.File
 import java.io.FileInputStream
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.io.path.Path
+
+/**
+ * 这个类方便通过文件 + 一堆子目录进行文件全路径拼接
+ */
+class PathFile(f: File, vararg subs: String): File(Path(f.absolutePath, *subs).toFile().absolutePath) {
+    init {
+        if (!parentFile.exists()) parentFile.mkdirs()
+    }
+}
 
 fun fileWalk(basePath: String, callback:(File) -> Unit) {
     val f = File(basePath)

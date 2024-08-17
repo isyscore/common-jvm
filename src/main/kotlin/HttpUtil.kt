@@ -91,7 +91,7 @@ fun httpGet(u: String, header: MutableMap<String, String>? = null, paramMap: Mut
     return resp
 }
 
-fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Serializable? = null): HttpResponse {
+fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null): HttpResponse {
     val resp =  HttpResponse()
     http {
         url = u
@@ -113,7 +113,27 @@ fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: Mu
     return resp
 }
 
-fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Serializable? = null): HttpResponse {
+fun httpForm(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
+    val resp = HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.POST
+        if (paramMap != null) postParam.putAll(paramMap)
+        if (header != null) headers.putAll(header)
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null): HttpResponse {
     val resp =  HttpResponse()
     http {
         url = u

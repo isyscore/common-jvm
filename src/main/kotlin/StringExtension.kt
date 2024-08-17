@@ -9,6 +9,30 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
+/**
+ * 命名方式转换，将下划线转换为驼峰
+ */
+fun String.conv(upperFirst: Boolean = false): String {
+    val tmp = split("_").joinToString(separator = "") { it.toTitleUpperCase() }
+    return if (upperFirst) tmp else tmp[0].lowercase() + tmp.drop(1)
+}
+
+/**
+ * 命名方式转换，将驼峰转为下划线
+ */
+fun String.unconv(): String = replace("([A-Z])".toRegex(), "_\$1").lowercase()
+
+/**
+ * 命名方式转换，将下划线转换为驼峰，优先大写转小写
+ */
+fun String.uconv(upperFirst: Boolean = false): String = this.lowercase().conv(upperFirst)
+
+/**
+ * 命名方式转换，将驼峰转为下划线，优先小写转大写
+ */
+fun String.uunconv(): String = this.unconv().uppercase()
+
+
 fun String.decodeURLPart(start: Int = 0, end: Int = length, charset: Charset = Charsets.UTF_8): String = decodeScan(start, end, false, charset)
 
 fun String.toJsonEncoded() = this.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"")
