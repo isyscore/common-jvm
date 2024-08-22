@@ -28,6 +28,8 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.jvm.jvmErasure
 
+val logger = ConsoleLogger(LogLevel.ERROR)
+
 /**
  * 使用 Druid 建立连接池
  */
@@ -260,36 +262,39 @@ fun <E : Entity<E>> ResultSet.retrieveColumn(column: Column<*>, intoEntity: E) {
         is NestedBinding -> if (binding.properties.isEmpty()) return else binding.properties.first().name
     }
 
-    when (column.sqlType) {
-        BooleanSqlType -> intoEntity[propName] = this.getBoolean(column.name)
-        IntSqlType -> intoEntity[propName] = this.getInt(column.name)
-        ShortSqlType -> intoEntity[propName] = this.getShort(column.name)
-        LongSqlType -> intoEntity[propName] = this.getLong(column.name)
-        FloatSqlType -> intoEntity[propName] = this.getFloat(column.name)
-        DoubleSqlType -> intoEntity[propName] = this.getDouble(column.name)
-        DecimalSqlType -> intoEntity[propName] = this.getBigDecimal(column.name)
-        VarcharSqlType -> intoEntity[propName] = this.getString(column.name)
-        BytesSqlType -> intoEntity[propName] = this.getBytes(column.name)
-        TimestampSqlType -> intoEntity[propName] = this.getTimestamp(column.name)
-        DateSqlType -> intoEntity[propName] = this.getDate(column.name)
-        TimeSqlType -> intoEntity[propName] = this.getTime(column.name)
-        InstantSqlType -> intoEntity[propName] = this.getTimestamp(column.name)?.toInstant()
-        LocalDateTimeSqlType -> intoEntity[propName] = this.getTimestamp(column.name)?.toLocalDateTime()
-        LocalDateSqlType -> intoEntity[propName] = this.getDate(column.name)?.toLocalDate()
-        LocalTimeSqlType -> intoEntity[propName] = this.getTime(column.name)?.toLocalTime()
-        TextSqlType -> intoEntity[propName] = this.getString(column.name)
-        BlobSqlType -> intoEntity[propName] = this.getBlob(column.name)?.let {
-            try {
-                it.binaryStream.use { s -> s.readBytes() }
-            } finally {
-                it.free()
+    try {
+        when (column.sqlType) {
+            BooleanSqlType -> intoEntity[propName] = this.getBoolean(column.name)
+            IntSqlType -> intoEntity[propName] = this.getInt(column.name)
+            ShortSqlType -> intoEntity[propName] = this.getShort(column.name)
+            LongSqlType -> intoEntity[propName] = this.getLong(column.name)
+            FloatSqlType -> intoEntity[propName] = this.getFloat(column.name)
+            DoubleSqlType -> intoEntity[propName] = this.getDouble(column.name)
+            DecimalSqlType -> intoEntity[propName] = this.getBigDecimal(column.name)
+            VarcharSqlType -> intoEntity[propName] = this.getString(column.name)
+            BytesSqlType -> intoEntity[propName] = this.getBytes(column.name)
+            TimestampSqlType -> intoEntity[propName] = this.getTimestamp(column.name)
+            DateSqlType -> intoEntity[propName] = this.getDate(column.name)
+            TimeSqlType -> intoEntity[propName] = this.getTime(column.name)
+            InstantSqlType -> intoEntity[propName] = this.getTimestamp(column.name)?.toInstant()
+            LocalDateTimeSqlType -> intoEntity[propName] = this.getTimestamp(column.name)?.toLocalDateTime()
+            LocalDateSqlType -> intoEntity[propName] = this.getDate(column.name)?.toLocalDate()
+            LocalTimeSqlType -> intoEntity[propName] = this.getTime(column.name)?.toLocalTime()
+            TextSqlType -> intoEntity[propName] = this.getString(column.name)
+            BlobSqlType -> intoEntity[propName] = this.getBlob(column.name)?.let {
+                try {
+                    it.binaryStream.use { s -> s.readBytes() }
+                } finally {
+                    it.free()
+                }
             }
+            MonthDaySqlType -> intoEntity[propName] = this.getString(column.name)?.let { MonthDay.parse(it, formatterMonthDay) }
+            YearMonthSqlType -> intoEntity[propName] = this.getString(column.name)?.let { YearMonth.parse(it, formatterYearMonth) }
+            YearSqlType -> intoEntity[propName] = Year.of(this.getInt(column.name))
+            UuidSqlType -> intoEntity[propName] = this.getObject(column.name) as? UUID
         }
-
-        MonthDaySqlType -> intoEntity[propName] = this.getString(column.name)?.let { MonthDay.parse(it, formatterMonthDay) }
-        YearMonthSqlType -> intoEntity[propName] = this.getString(column.name)?.let { YearMonth.parse(it, formatterYearMonth) }
-        YearSqlType -> intoEntity[propName] = Year.of(this.getInt(column.name))
-        UuidSqlType -> intoEntity[propName] = this.getObject(column.name) as? UUID
+    } catch (e: Exception) {
+        logger.error("ResultSet.retrieveColumn[${propName}]", e)
     }
 
 }
@@ -343,39 +348,47 @@ fun ResultSet.getMatchFieldValue(name: String, type: Class<*>): Any? {
 
 fun <E : Any> ResultSet.setField(entity: E, field: Field) {
     val v = getMatchFieldValue(field.name, field.type)
-    when (field.type) {
-        Boolean::class.java -> field.setBoolean(entity, v as Boolean)
-        Int::class.java -> field.setInt(entity, v as Int)
-        Short::class.java -> field.setShort(entity, v as Short)
-        Long::class.java -> field.setLong(entity, v as Long)
-        Float::class.java -> field.setFloat(entity, v as Float)
-        Double::class.java -> field.setDouble(entity, v as Double)
-        else -> field.set(entity, v)
+    try {
+        when (field.type) {
+            Boolean::class.java -> field.setBoolean(entity, v as Boolean)
+            Int::class.java -> field.setInt(entity, v as Int)
+            Short::class.java -> field.setShort(entity, v as Short)
+            Long::class.java -> field.setLong(entity, v as Long)
+            Float::class.java -> field.setFloat(entity, v as Float)
+            Double::class.java -> field.setDouble(entity, v as Double)
+            else -> field.set(entity, v)
+        }
+    } catch (e: Exception) {
+        logger.error("ResultSet.setField[${field.name}]", e)
     }
 }
 
 fun <E : Any> ResultSet.setField(entity: E, field: Field, index: Int) {
-    when (field.type) {
-        Boolean::class.java -> field.setBoolean(entity, getBoolean(index))
-        Int::class.java -> field.setInt(entity, getInt(index))
-        Short::class.java -> field.setShort(entity, getShort(index))
-        Long::class.java -> field.setLong(entity, getLong(index))
-        Float::class.java -> field.setFloat(entity, getFloat(index))
-        Double::class.java -> field.setDouble(entity, getDouble(index))
-        String::class.java -> field.set(entity, getString(index))
-        BigDecimal::class.java -> field.set(entity, getBigDecimal(index))
-        ByteArray::class.java -> field.set(entity, getBytes(index))
-        Timestamp::class.java -> field.set(entity, getTimestamp(index))
-        Date::class.java -> field.set(entity, getDate(index))
-        Time::class.java -> field.set(entity, getTime(index))
-        Instant::class.java -> field.set(entity, getTimestamp(index)?.toInstant())
-        LocalDateTime::class.java -> field.set(entity, getTimestamp(index)?.toLocalDateTime())
-        LocalDate::class.java -> field.set(entity, getDate(index)?.toLocalDate())
-        LocalTime::class.java -> field.set(entity, getTime(index)?.toLocalTime())
-        MonthDay::class.java -> field.set(entity, getString(index)?.let { MonthDay.parse(it, formatterMonthDay) })
-        YearMonth::class.java -> field.set(entity, getString(index)?.let { YearMonth.parse(it, formatterYearMonth) })
-        Year::class.java -> field.set(entity, Year.of(getInt(index)))
-        UUID::class.java -> field.set(entity, getObject(index) as? UUID)
+    try {
+        when (field.type) {
+            Boolean::class.java -> field.setBoolean(entity, getBoolean(index))
+            Int::class.java -> field.setInt(entity, getInt(index))
+            Short::class.java -> field.setShort(entity, getShort(index))
+            Long::class.java -> field.setLong(entity, getLong(index))
+            Float::class.java -> field.setFloat(entity, getFloat(index))
+            Double::class.java -> field.setDouble(entity, getDouble(index))
+            String::class.java -> field.set(entity, getString(index))
+            BigDecimal::class.java -> field.set(entity, getBigDecimal(index))
+            ByteArray::class.java -> field.set(entity, getBytes(index))
+            Timestamp::class.java -> field.set(entity, getTimestamp(index))
+            Date::class.java -> field.set(entity, getDate(index))
+            Time::class.java -> field.set(entity, getTime(index))
+            Instant::class.java -> field.set(entity, getTimestamp(index)?.toInstant())
+            LocalDateTime::class.java -> field.set(entity, getTimestamp(index)?.toLocalDateTime())
+            LocalDate::class.java -> field.set(entity, getDate(index)?.toLocalDate())
+            LocalTime::class.java -> field.set(entity, getTime(index)?.toLocalTime())
+            MonthDay::class.java -> field.set(entity, getString(index)?.let { MonthDay.parse(it, formatterMonthDay) })
+            YearMonth::class.java -> field.set(entity, getString(index)?.let { YearMonth.parse(it, formatterYearMonth) })
+            Year::class.java -> field.set(entity, Year.of(getInt(index)))
+            UUID::class.java -> field.set(entity, getObject(index) as? UUID)
+        }
+    } catch (e: Exception) {
+        logger.error("ResultSet.setFieldIndexed[${field.name}, ${index}]", e)
     }
 }
 
@@ -406,14 +419,18 @@ inline fun <reified E : Entity<E>, T> Entity<E>.setFieldValue(field: Field, dc: 
     // 找不到字段，退出
     val mem = entityClass.members.find { it is KProperty<*> && it.name.conv().lowercase() == field.name.conv().lowercase() && it.returnType.jvmErasure.java == field.type } ?: return
     // 根据不同的类型设置数据
-    when (field.type) {
-        Boolean::class.java -> this[mem.name] = field.getBoolean(dc)
-        Int::class.java -> this[mem.name] = field.getInt(dc)
-        Short::class.java -> this[mem.name] = field.getShort(dc)
-        Long::class.java -> this[mem.name] = field.getLong(dc)
-        Float::class.java -> this[mem.name] = field.getFloat(dc)
-        Double::class.java -> this[mem.name] = field.getDouble(dc)
-        else -> this[mem.name] = field.get(dc)
+    try {
+        when (field.type) {
+            Boolean::class.java -> this[mem.name] = field.getBoolean(dc)
+            Int::class.java -> this[mem.name] = field.getInt(dc)
+            Short::class.java -> this[mem.name] = field.getShort(dc)
+            Long::class.java -> this[mem.name] = field.getLong(dc)
+            Float::class.java -> this[mem.name] = field.getFloat(dc)
+            Double::class.java -> this[mem.name] = field.getDouble(dc)
+            else -> this[mem.name] = field.get(dc)
+        }
+    } catch (e: Exception) {
+        logger.error("Entity.setFieldValue[${field.name}]", e)
     }
 }
 
@@ -444,7 +461,11 @@ fun entityFillIntoDataClass(entity: Entity<*>, dc: Any) {
     dc::class.java.declaredFields.forEach { field ->
         field.isAccessible = true
         if (entity.properties.containsKey(field.name)) {
-            field.set(dc, entity.properties[field.name])
+            try {
+                field.set(dc, entity.properties[field.name])
+            } catch (e: Exception) {
+                logger.error("entityFillIntoDataClass[${field.name}]", e)
+            }
         }
     }
 }
