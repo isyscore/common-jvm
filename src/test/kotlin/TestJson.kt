@@ -5,7 +5,7 @@ import com.isyscore.kotlin.common.toJson
 import com.isyscore.kotlin.common.toObj
 import org.junit.Test
 
-open class CSample(val name: String = "sample", val field1: String = "f1", val field2: String = "f2")
+open class CSample(val name: String = "sample", val field1: String = "f1", val field2: String = "f2", val field3: String? = null)
 
 class TestJson {
 

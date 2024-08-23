@@ -57,7 +57,7 @@ private fun initJacksonMapper() {
             indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
             indentObjectsWith(DefaultIndenter("  ", "\n"))
         })
-        setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        setSerializationInclusion(JsonInclude.Include.ALWAYS)
         enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         deactivateDefaultTyping()
     }
