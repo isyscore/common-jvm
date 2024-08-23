@@ -319,7 +319,9 @@ fun <R> ResultSet.useMap(block: (ResultSet) -> R): List<R> {
 
 fun ResultSet.getMatchFieldValue(name: String, type: Class<*>): Any? {
     val col = (1..this.metaData.columnCount).find {
-        this.metaData.getColumnName(it).conv().lowercase() == name.conv().lowercase()
+        var matched = this.metaData.getColumnName(it).conv().lowercase() == name.conv().lowercase()
+        if (!matched) matched = this.metaData.getColumnLabel(it).conv().lowercase() == name.conv().lowercase()
+        matched
     } ?: return null
     return when (type) {
         Boolean::class.java -> getBoolean(col)
@@ -342,7 +344,7 @@ fun ResultSet.getMatchFieldValue(name: String, type: Class<*>): Any? {
         YearMonth::class.java -> getString(col)?.let { YearMonth.parse(it, formatterYearMonth) }
         Year::class.java -> Year.of(getInt(col))
         UUID::class.java -> getObject(col) as? UUID
-        else -> null
+        else -> getObject(col)
     }
 }
 
@@ -386,6 +388,7 @@ fun <E : Any> ResultSet.setField(entity: E, field: Field, index: Int) {
             YearMonth::class.java -> field.set(entity, getString(index)?.let { YearMonth.parse(it, formatterYearMonth) })
             Year::class.java -> field.set(entity, Year.of(getInt(index)))
             UUID::class.java -> field.set(entity, getObject(index) as? UUID)
+            else -> field.set(entity, getObject(index))
         }
     } catch (e: Exception) {
         logger.error("ResultSet.setFieldIndexed[${field.name}, ${index}]", e)
