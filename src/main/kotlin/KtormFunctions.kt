@@ -419,7 +419,7 @@ inline fun <reified T : Number> sin(x: T): FunctionExpression<BigDecimal> = Func
  *
  * 返回x的平方根
  */
-fun sqrt(x: ColumnDeclaring<*>): FunctionExpression<BigDecimal> = FunctionExpression("sqrt", listOf(strMap(x)), SqlType.of<BigDecimal>()!!)
+fun sqrt(x: ColumnDeclaring<*>): FunctionExpression<BigDecimal> = FunctionExpression("sqrt", listOf(x.asExpression()), SqlType.of<BigDecimal>()!!)
 inline fun <reified T : Number> sqrt(x: T): FunctionExpression<BigDecimal> = FunctionExpression("sqrt", listOf(ArgumentExpression(x, SqlType.of<T>()!!)), SqlType.of<BigDecimal>()!!)
 
 /**
@@ -737,17 +737,26 @@ fun year(d: ColumnDeclaring<*>): FunctionExpression<Int> = FunctionExpression("y
  */
 fun yearWeek(d: ColumnDeclaring<*>, mode: Int): FunctionExpression<Int> = FunctionExpression("yearweek", listOf(d.asExpression(), ArgumentExpression(mode, IntSqlType)), IntSqlType)
 
-/*
-password(str）	将str字符串以数据库密码的形式加密
-md5(str)	对str字符串以MD5不可逆算法模式加密
-encode(str,key)	通过key密钥对str字符串进行加密（对称加密算法）。
-decode(str,key)	通过key密钥对str字符串进行解密。
-aes_encrypt(str,key)	通过key密钥对str字符串，以AES算法进行加密。
-aes_decrypt(str,key)	通过key密钥对str字符串，以AES算法进行解密。
-sha(str)	计算str字符串的散列算法校验值。
-encrypt(str,salt)	使用salt盐值对str字符串进行加密。
-decrypt(str,salt)	使用salt盐值对str字符串进行解密。
+/**
+ * password(str）
+ *
+ * 将str字符串以数据库密码的形式加密
  */
+fun password(c: ColumnDeclaring<*>): FunctionExpression<String> = FunctionExpression("password", listOf(c.asExpression()), SqlType.of<String>()!!)
+
+/**
+ * md5(str)
+ *
+ * 对str字符串以MD5不可逆算法模式加密
+ */
+fun md5(c: ColumnDeclaring<*>): FunctionExpression<String> = FunctionExpression("md5", listOf(c.asExpression()), SqlType.of<String>()!!)
+
+/**
+ * sha(str)
+ *
+ * 计算str字符串的散列算法校验值。
+ */
+fun sha(c: ColumnDeclaring<*>): FunctionExpression<String> = FunctionExpression("sha", listOf(c.asExpression()), SqlType.of<String>()!!)
 
 fun strMap(arg: Any): ScalarExpression<*> = when (arg) {
     is Column<*> -> arg.asExpression()
