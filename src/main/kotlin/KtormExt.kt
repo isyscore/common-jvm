@@ -35,16 +35,15 @@ val logger = ConsoleLogger(LogLevel.ERROR)
  */
 fun databasePoolOf(driverClass: String, jdbcUrl: String, user: String, password: String, dialect: SqlDialect, logLevel: LogLevel = LogLevel.INFO, validationQuery: String = "select 1;"): Pair<Database?, Throwable?> {
     try {
-        val dataSource = DruidDataSourceFactory.createDataSource(
-            mapOf(
-                "driverClassName" to driverClass,
-                "url" to jdbcUrl,
-                "username" to user,
-                "password" to password,
-                "logLevel" to logLevel.name.uppercase(),
-                "validationQuery" to validationQuery
-            )
+
+        val prop = mutableMapOf("driverClassName" to driverClass,
+            "url" to jdbcUrl,
+            "username" to user,
+            "password" to password,
+            "logLevel" to logLevel.name.uppercase(),
+            "validationQuery" to validationQuery
         )
+        val dataSource = DruidDataSourceFactory.createDataSource(prop)
         val db = Database.connect(dataSource = dataSource, dialect = dialect, logger = ConsoleLogger(logLevel))
         return db to null
     } catch (e: Throwable) {

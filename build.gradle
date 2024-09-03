@@ -43,6 +43,7 @@ dependencies {
     api "com.squareup.okhttp3:okhttp-sse:4.12.0"
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'mysql:mysql-connector-java:8.0.33'
+    testImplementation 'cn.com.kingbase:kingbase8:8.6.0'
 }
 
 sourceCompatibility = 1.8
