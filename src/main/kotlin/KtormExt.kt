@@ -38,6 +38,7 @@ fun databasePoolOf(
     driverClass: String, jdbcUrl: String, user: String, password: String, dialect: SqlDialect,
     logLevel: LogLevel = LogLevel.INFO, validationQuery: String = "select 1;",
     maxActive: Int = 20,  minIdle: Int = 10, initSize: Int = 0, maxWait: Long = 10000L,
+    connTimeout: Int = 10, queryTimeout: Int = 30, socketTimeout: Int = 60, removeAbandonedTimeout: Int = 30
     ): Pair<Database?, Throwable?> {
     try {
 
@@ -55,6 +56,12 @@ fun databasePoolOf(
         dataSource.maxWait = maxWait
         dataSource.isRemoveAbandoned = true
         dataSource.isTestWhileIdle = true
+        dataSource.connectTimeout = connTimeout
+        dataSource.queryTimeout = queryTimeout
+        dataSource.socketTimeout = socketTimeout
+        dataSource.isKillWhenSocketReadTimeout = true
+        dataSource.isRemoveAbandoned = true
+        dataSource.removeAbandonedTimeout = removeAbandonedTimeout
         val db = Database.connect(dataSource = dataSource, dialect = dialect, logger = ConsoleLogger(logLevel))
         return db to null
     } catch (e: Throwable) {
