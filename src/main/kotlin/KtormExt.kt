@@ -2,6 +2,7 @@
 
 package com.isyscore.kotlin.common
 
+import com.alibaba.druid.pool.DruidDataSource
 import com.alibaba.druid.pool.DruidDataSourceFactory
 import com.isyscore.kotlin.common.KtormColumnSelection.multipleColumns
 import com.isyscore.kotlin.common.KtormColumnSelection.singleColumn
@@ -33,7 +34,11 @@ val logger = ConsoleLogger(LogLevel.ERROR)
 /**
  * 使用 Druid 建立连接池
  */
-fun databasePoolOf(driverClass: String, jdbcUrl: String, user: String, password: String, dialect: SqlDialect, logLevel: LogLevel = LogLevel.INFO, validationQuery: String = "select 1;"): Pair<Database?, Throwable?> {
+fun databasePoolOf(
+    driverClass: String, jdbcUrl: String, user: String, password: String, dialect: SqlDialect,
+    logLevel: LogLevel = LogLevel.INFO, validationQuery: String = "select 1;",
+    maxActive: Int = 20,  minIdle: Int = 10, initSize: Int = 0, maxWait: Long = 10000L,
+    ): Pair<Database?, Throwable?> {
     try {
 
         val prop = mutableMapOf("driverClassName" to driverClass,
@@ -43,7 +48,13 @@ fun databasePoolOf(driverClass: String, jdbcUrl: String, user: String, password:
             "logLevel" to logLevel.name.uppercase(),
             "validationQuery" to validationQuery
         )
-        val dataSource = DruidDataSourceFactory.createDataSource(prop)
+        val dataSource = DruidDataSourceFactory.createDataSource(prop) as DruidDataSource
+        dataSource.maxActive = maxActive
+        dataSource.minIdle = minIdle
+        dataSource.initialSize = initSize
+        dataSource.maxWait = maxWait
+        dataSource.isRemoveAbandoned = true
+        dataSource.isTestWhileIdle = true
         val db = Database.connect(dataSource = dataSource, dialect = dialect, logger = ConsoleLogger(logLevel))
         return db to null
     } catch (e: Throwable) {

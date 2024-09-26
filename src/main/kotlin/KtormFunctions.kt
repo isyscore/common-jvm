@@ -138,7 +138,9 @@ fun replace(s: String, s1: String, s2: ColumnDeclaring<String>): FunctionExpress
     FunctionExpression("replace", listOf(ArgumentExpression(s, SqlType.of<String>()!!), ArgumentExpression(s1, SqlType.of<String>()!!), s2.asExpression()), SqlType.of<String>()!!)
 
 /**
- * REVERSE(s)	将字符串s的顺序反过来
+ * REVERSE(s)
+ *
+ * 将字符串s的顺序反过来
  */
 fun reverse(s: ColumnDeclaring<String>): FunctionExpression<String> = FunctionExpression("reverse", listOf(s.asExpression()), SqlType.of<String>()!!)
 
