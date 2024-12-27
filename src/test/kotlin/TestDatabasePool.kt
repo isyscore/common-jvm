@@ -24,18 +24,6 @@ class TestDatabasePool {
     }
 
     @Test
-    fun testSchema() {
-        val (db, err) = databasePoolOf("com.kingbase8.Driver", "jdbc:kingbase8://localhost:54321/root?currentSchema=yugiohapi2", "root", "rootroot", OracleDialect() , schema = "yugiohapi2")
-        if (db == null) return
-        val list = db.useConnection { conn ->
-            conn.createStatement().use { stmt ->
-                stmt.executeQuery("select * from card_name_texts").useMap { createEntity<VO2>(it) }
-            }
-        }
-        println(list)
-    }
-
-    @Test
     fun testKingbase() {
         Class.forName("com.kingbase8.Driver")
         val conn = DriverManager.getConnection("jdbc:kingbase8://localhost:54321/root", "root", "rootroot")

@@ -334,11 +334,15 @@ fun <R> ResultSet.useMap(block: (ResultSet) -> R): List<R> {
     return list
 }
 
-fun ResultSet.getMatchFieldValue(name: String, type: Class<*>): Any? {
+fun ResultSet.getMatchFieldValue(name: String, type: Class<*>, strict: Boolean = false): Any? {
     val col = (1..this.metaData.columnCount).find {
-        var matched = this.metaData.getColumnName(it).conv().lowercase() == name.conv().lowercase()
-        if (!matched) matched = this.metaData.getColumnLabel(it).conv().lowercase() == name.conv().lowercase()
-        matched
+        if (strict) {
+            this.metaData.getColumnLabel(it).conv().lowercase() == name.conv().lowercase()
+        } else {
+            var matched = this.metaData.getColumnLabel(it).conv().lowercase() == name.conv().lowercase()
+            if (!matched) matched = this.metaData.getColumnName(it).conv().lowercase() == name.conv().lowercase()
+            matched
+        }
     } ?: return null
     return when (type) {
         Boolean::class.java -> getBoolean(col)
@@ -365,8 +369,8 @@ fun ResultSet.getMatchFieldValue(name: String, type: Class<*>): Any? {
     }
 }
 
-fun <E : Any> ResultSet.setField(entity: E, field: Field) {
-    val v = getMatchFieldValue(field.name, field.type)
+fun <E : Any> ResultSet.setField(entity: E, field: Field, strict: Boolean = false) {
+    val v = getMatchFieldValue(field.name, field.type, strict)
     try {
         when (field.type) {
             Boolean::class.java -> field.setBoolean(entity, v as Boolean)
@@ -412,12 +416,12 @@ fun <E : Any> ResultSet.setField(entity: E, field: Field, index: Int) {
     }
 }
 
-inline fun <reified E : Any> createEntity(row: ResultSet): E {
+inline fun <reified E : Any> createEntity(row: ResultSet, strict: Boolean = false): E {
     val entity = E::class.java.getDeclaredConstructor().newInstance()
     val fields = E::class.java.declaredFields
     fields.forEach { field ->
         field.isAccessible = true
-        row.setField(entity, field)
+        row.setField(entity, field, strict)
     }
     return entity
 }
