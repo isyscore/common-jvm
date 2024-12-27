@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST", "unused")
+@file:Suppress("UNCHECKED_CAST", "unused", "DuplicatedCode")
 
 package com.isyscore.kotlin.common
 
@@ -488,4 +488,80 @@ fun entityFillIntoDataClass(entity: Entity<*>, dc: Any) {
             }
         }
     }
+}
+
+fun <E : Entity<E>> AssignmentsBuilder.setEntityColumns(columns: Collection<Column<*>>, value: E?, fillNull: Boolean = false, skipFields: List<String> = listOf()) {
+    if (value == null) return
+    for (col in columns) {
+        val binding = col.binding as? NestedBinding
+        if (binding?.properties?.isNotEmpty() == true) {
+            val t = binding.properties.first()
+            if (skipFields.contains(t.name)) continue
+            val v = value[t.name]
+            if (v == null && !fillNull) continue
+            when(t.returnType.jvmErasure) {
+                Boolean::class -> set(col as Column<Boolean>, v as? Boolean)
+                Int::class -> set(col as Column<Int>, v as? Int)
+                Short::class -> set(col as Column<Short>, v as? Short)
+                Long::class -> set(col as Column<Long>, v as? Long)
+                Float::class -> set(col as Column<Float>, v as? Float)
+                Double::class -> set(col as Column<Double>, v as? Double)
+                BigDecimal::class -> set(col as Column<BigDecimal>, v as? BigDecimal)
+                String::class -> set(col as Column<String>, v as? String)
+                ByteArray::class -> set(col as Column<ByteArray>, v as? ByteArray)
+                Timestamp::class -> set(col as Column<Timestamp>, v as? Timestamp)
+                java.sql.Date::class -> set(col as Column<java.sql.Date>, v as? java.sql.Date)
+                Time::class -> set(col as Column<Time>, v as? Time)
+                Instant::class -> set(col as Column<Instant>, v as? Instant)
+                LocalDateTime::class -> set(col as Column<LocalDateTime>, v as? LocalDateTime)
+                LocalDate::class -> set(col as Column<LocalDate>, v as? LocalDate)
+                LocalTime::class -> set(col as Column<LocalTime>, v as? LocalTime)
+                MonthDay::class -> set(col as Column<MonthDay>, v as? MonthDay)
+                YearMonth::class -> set(col as Column<YearMonth>, v as? YearMonth)
+                Year::class -> set(col as Column<Year>, v as? Year)
+                UUID::class -> set(col as Column<UUID>, v as? UUID)
+            }
+        }
+    }
+}
+
+fun <E : Any> AssignmentsBuilder.setDataColumns(columns: Collection<Column<*>>, value: E?, fillNull: Boolean = false, skipFields: List<String> = listOf()) {
+    if (value == null) return
+    for (col in columns) {
+        val binding = col.binding as? NestedBinding
+        if (binding?.properties?.isNotEmpty() == true) {
+            val t = binding.properties.first()
+            if (skipFields.contains(t.name)) continue
+            val v = value.iGet(t.name)
+            if (v == null && !fillNull) continue
+            when(t.returnType.jvmErasure) {
+                Boolean::class -> set(col as Column<Boolean>, v as? Boolean)
+                Int::class -> set(col as Column<Int>, v as? Int)
+                Short::class -> set(col as Column<Short>, v as? Short)
+                Long::class -> set(col as Column<Long>, v as? Long)
+                Float::class -> set(col as Column<Float>, v as? Float)
+                Double::class -> set(col as Column<Double>, v as? Double)
+                BigDecimal::class -> set(col as Column<BigDecimal>, v as? BigDecimal)
+                String::class -> set(col as Column<String>, v as? String)
+                ByteArray::class -> set(col as Column<ByteArray>, v as? ByteArray)
+                Timestamp::class -> set(col as Column<Timestamp>, v as? Timestamp)
+                java.sql.Date::class -> set(col as Column<java.sql.Date>, v as? java.sql.Date)
+                Time::class -> set(col as Column<Time>, v as? Time)
+                Instant::class -> set(col as Column<Instant>, v as? Instant)
+                LocalDateTime::class -> set(col as Column<LocalDateTime>, v as? LocalDateTime)
+                LocalDate::class -> set(col as Column<LocalDate>, v as? LocalDate)
+                LocalTime::class -> set(col as Column<LocalTime>, v as? LocalTime)
+                MonthDay::class -> set(col as Column<MonthDay>, v as? MonthDay)
+                YearMonth::class -> set(col as Column<YearMonth>, v as? YearMonth)
+                Year::class -> set(col as Column<Year>, v as? Year)
+                UUID::class -> set(col as Column<UUID>, v as? UUID)
+            }
+        }
+    }
+}
+
+private fun Any.iGet(name: String): Any? = try {
+    this::class.java.getDeclaredField(name).apply { isAccessible = true }.get(this)
+} catch (e: Exception) {
+    null
 }

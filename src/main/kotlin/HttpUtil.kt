@@ -65,7 +65,7 @@ fun http(init: HttpUtils.() -> Unit): String? {
 }
 
 data class HttpResponse(
-    var code: Int = 200,
+    var code: Int = -1,
     var header: Map<String, String> = mapOf(),
     var body: String = "",
     var cookie: Set<Cookie>? = setOf(),
