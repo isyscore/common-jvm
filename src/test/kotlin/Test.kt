@@ -18,6 +18,10 @@ class Sample {
         list.add(a)
         return this
     }
+
+    fun sample() {
+        
+    }
 }
 
 

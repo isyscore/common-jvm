@@ -739,6 +739,20 @@ fun year(d: ColumnDeclaring<*>): FunctionExpression<Int> = FunctionExpression("y
  */
 fun yearWeek(d: ColumnDeclaring<*>, mode: Int): FunctionExpression<Int> = FunctionExpression("yearweek", listOf(d.asExpression(), ArgumentExpression(mode, IntSqlType)), IntSqlType)
 
+@JvmName("date_diff_ldt")
+fun dateDiff(left: ColumnDeclaring<LocalDateTime>, right: ColumnDeclaring<LocalDateTime>): FunctionExpression<Int> =
+    FunctionExpression(
+        functionName = "datediff",
+        arguments = listOf(left.asExpression(), right.asExpression()),
+        sqlType = IntSqlType
+    )
+
+@JvmName("date_diff_ldt")
+fun dateDiff(left: ColumnDeclaring<LocalDateTime>, right: LocalDateTime): FunctionExpression<Int> = dateDiff(left, left.wrapArgument(right))
+
+@JvmName("date_diff_ldt")
+fun dateDiff(left: LocalDateTime, right: ColumnDeclaring<LocalDateTime>): FunctionExpression<Int> = dateDiff(right, right.wrapArgument(left))
+
 /**
  * password(str）
  *
