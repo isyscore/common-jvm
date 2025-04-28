@@ -201,9 +201,9 @@ object KtormColumnSelection {
 
     sealed interface ColumnSelection
 
-    data class SingleColumn internal constructor(val column: ColumnDeclaring<*>) : ColumnSelection
+    data class SingleColumn(val column: ColumnDeclaring<*>) : ColumnSelection
 
-    data class MultipleColumns internal constructor(val columns: Collection<ColumnDeclaring<*>>) : ColumnSelection
+    data class MultipleColumns(val columns: Collection<ColumnDeclaring<*>>) : ColumnSelection
 
     fun singleColumn(column: ColumnDeclaring<*>): SingleColumn = SingleColumn(column)
 

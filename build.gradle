@@ -16,13 +16,15 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 group 'com.github.isyscore'
-version '2.3.2.7'
+version '3.0.0.0'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    api "org.burningwave:core:12.64.3"
+    api "com.google.guava:guava:33.1.0-jre"
     api 'com.squareup.okhttp3:okhttp:4.12.0'
     api "com.squareup.okio:okio-jvm:3.7.0"
     api 'commons-io:commons-io:2.16.0'
@@ -30,7 +32,7 @@ dependencies {
     api 'org.apache.commons:commons-lang3:3.13.0'
     api 'org.jsoup:jsoup:1.16.1'
     api 'com.google.code.gson:gson:2.10.1'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
     api "org.ktorm:ktorm-core:3.6.0"
     api "org.ktorm:ktorm-jackson:3.6.0"
     api "com.alibaba:druid:1.2.18"
@@ -47,14 +49,14 @@ dependencies {
     testImplementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = 17
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8" // "17"
+    kotlinOptions.jvmTarget = "17"
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8" // "17"
+    kotlinOptions.jvmTarget = "17"
 }
 
 task sourcesJar(type: Jar) {
@@ -76,7 +78,7 @@ publishing {
         mavenKotlin(MavenPublication) {
             groupId = "com.github.isyscore"
             artifactId = "common-jvm"
-            version = "2.3.2.7"
+            version = "3.0.0.0"
             from components.java
             artifact sourcesJar
             artifact javadocJar

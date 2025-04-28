@@ -8,7 +8,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.Serializable
 import java.net.Proxy
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
@@ -69,15 +68,23 @@ data class HttpResponse(
     var header: Map<String, String> = mapOf(),
     var body: String = "",
     var cookie: Set<Cookie>? = setOf(),
-    var error: Throwable? = null)
+    var error: Throwable? = null
+)
 
-fun httpGet(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
-    val resp =  HttpResponse()
+fun httpGet(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): HttpResponse {
+    val resp = HttpResponse()
     http {
         url = u
         method = HttpMethod.GET
         getParam = paramMap?.map { "${it.key}=${it.value}" }?.joinToString("&") ?: ""
+
         if (header != null) headers.putAll(header)
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
         onSuccess { code, text, headers, cookie ->
             resp.code = code
             resp.body = text ?: ""
@@ -91,35 +98,30 @@ fun httpGet(u: String, header: MutableMap<String, String>? = null, paramMap: Mut
     return resp
 }
 
-fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null): HttpResponse {
-    val resp =  HttpResponse()
-    http {
-        url = u
-        method = HttpMethod.POST
-        if (paramMap != null) postParam.putAll(paramMap)
-        if (header != null) headers.putAll(header)
-        mimeType = "application/json"
-        data = body.toJson()
-        onSuccess { code, text, headers, cookie ->
-            resp.code = code
-            resp.body = text ?: ""
-            resp.header = headers
-            resp.cookie = cookie
-        }
-        onFail {
-            resp.error = it
-        }
-    }
-    return resp
+inline fun <reified T> httpGetForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): T? {
+    val resp = httpGet(u, header, paramMap, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
 }
 
-fun httpForm(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
+fun httpPost(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null, timeout: Long = 10000L): HttpResponse {
     val resp = HttpResponse()
     http {
         url = u
         method = HttpMethod.POST
         if (paramMap != null) postParam.putAll(paramMap)
         if (header != null) headers.putAll(header)
+        mimeType = "application/json"
+        data = body?.toJson() ?: "null"
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
         onSuccess { code, text, headers, cookie ->
             resp.code = code
             resp.body = text ?: ""
@@ -133,15 +135,65 @@ fun httpForm(u: String, header: MutableMap<String, String>? = null, paramMap: Mu
     return resp
 }
 
-fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null): HttpResponse {
-    val resp =  HttpResponse()
+inline fun <reified T> httpPostForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null, timeout: Long = 10000L): T? {
+    val resp = httpPost(u, header, paramMap, body, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
+}
+
+fun httpPostForm(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): HttpResponse {
+    val resp = HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.POST
+        if (paramMap != null) postParam.putAll(paramMap)
+        if (header != null) headers.putAll(header)
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+inline fun <reified T> httpPostFormForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): T? {
+    val resp = httpPostForm(u, header, paramMap, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
+}
+
+fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null, timeout: Long = 10000L): HttpResponse {
+    val resp = HttpResponse()
     http {
         url = u
         method = HttpMethod.PUT
         if (paramMap != null) postParam.putAll(paramMap)
         if (header != null) headers.putAll(header)
         mimeType = "application/json"
-        data = body.toJson()
+        data = body?.toJson() ?: "null"
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
         onSuccess { code, text, headers, cookie ->
             resp.code = code
             resp.body = text ?: ""
@@ -155,13 +207,28 @@ fun httpPut(u: String, header: MutableMap<String, String>? = null, paramMap: Mut
     return resp
 }
 
-fun httpDelete(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null): HttpResponse {
-    val resp =  HttpResponse()
+inline fun <reified T> httpPutForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, body: Any? = null, timeout: Long = 10000L): T? {
+    val resp = httpPut(u, header, paramMap, body, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
+}
+
+fun httpPutForm(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): HttpResponse {
+    val resp = HttpResponse()
     http {
         url = u
-        method = HttpMethod.DELETE
-        getParam = paramMap?.map { "${it.key}=${it.value}" }?.joinToString("&") ?: ""
+        method = HttpMethod.PUT
+        if (paramMap != null) postParam.putAll(paramMap)
         if (header != null) headers.putAll(header)
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
         onSuccess { code, text, headers, cookie ->
             resp.code = code
             resp.body = text ?: ""
@@ -173,6 +240,50 @@ fun httpDelete(u: String, header: MutableMap<String, String>? = null, paramMap: 
         }
     }
     return resp
+}
+
+inline fun <reified T> httpPutFormForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): T? {
+    val resp = httpPutForm(u, header, paramMap, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
+}
+
+fun httpDelete(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): HttpResponse {
+    val resp = HttpResponse()
+    http {
+        url = u
+        method = HttpMethod.DELETE
+        getParam = paramMap?.map { "${it.key}=${it.value}" }?.joinToString("&") ?: ""
+        if (header != null) headers.putAll(header)
+
+        connectTimeout = timeout
+        readTimeout = timeout
+        writeTimeout = timeout
+        callTimeout = timeout
+
+        onSuccess { code, text, headers, cookie ->
+            resp.code = code
+            resp.body = text ?: ""
+            resp.header = headers
+            resp.cookie = cookie
+        }
+        onFail {
+            resp.error = it
+        }
+    }
+    return resp
+}
+
+inline fun <reified T> httpDeleteForObj(u: String, header: MutableMap<String, String>? = null, paramMap: MutableMap<String, String>? = null, timeout: Long = 10000L): T? {
+    val resp = httpDelete(u, header, paramMap, timeout)
+    return if (resp.code == 200) try {
+        resp.body.toObj<T>()
+    } catch (e: Exception) {
+        null
+    } else null
 }
 
 private object HttpOperations {
@@ -198,6 +309,7 @@ private object HttpOperations {
             .url(util.url + if (util.getParam != "") "?${util.getParam}" else "")
             .headers(util, util.headers)
             .get().build()
+
         HttpMethod.POST -> Request.Builder()
             .url(util.url + if (util.getParam != "") "?${util.getParam}" else "")
             .headers(util, util.headers)
