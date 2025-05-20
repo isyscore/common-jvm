@@ -39,7 +39,6 @@ class TestHttpPressure {
         }
     }
 
-
     @Test
     fun testDeckList() {
         val jsonRet = http {

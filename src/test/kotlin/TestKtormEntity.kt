@@ -5,8 +5,6 @@ import org.ktorm.entity.Entity
 
 class TestKtormEntity {
 
-
-
     @Test
     fun test() {
         val s = Sample1 {

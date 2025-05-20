@@ -14,8 +14,6 @@ class TestNewHttp {
 
         val obj = http {
             method = HttpMethod.POST
-
-
         }
     }
 

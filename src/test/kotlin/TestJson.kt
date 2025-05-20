@@ -24,9 +24,6 @@ class TestJson {
         val json = """{"user_name":"hxj","user_age": 40}"""
         val u = json.toObj<SampleAssign>()
         println(u)
-//        val jo = JSONObject(json)
-//        val m: Map<String, Any?> = jo.toMap().toMutableMap()
-//        println(m)
     }
 
     @Test
@@ -37,16 +34,12 @@ class TestJson {
         println(m)
     }
 
-
     @Test
     fun test3() {
         val json = """{'user_name':'hxj','age': 40}"""
         val u = json.toObj<SampleAssign>()
         println(u)
     }
-
-
-
 }
 
 

@@ -7,7 +7,6 @@ import org.ktorm.support.mysql.MySqlDialect
 
 class TestMaterial {
 
-
     var db: Database = Database.connect("jdbc:mariadb://10.30.30.148:23306/isc_ecology_model_prod", "org.mariadb.jdbc.Driver", "root", "ZljIsysc0re123", MySqlDialect())
 
     @Test

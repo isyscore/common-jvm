@@ -9,6 +9,7 @@ import kotlin.math.ceil
 
 
 class Sample {
+
     lateinit var list: MutableList<String>
 
     infix fun and(a: String): Sample {
@@ -267,8 +268,6 @@ class TestCase {
         println(wd(60))
         println(wd(15))
     }
-
-
 
 }
 
