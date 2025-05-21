@@ -16,7 +16,7 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 group 'com.github.isyscore'
-version '3.0.0.1'
+version '3.0.0.2'
 
 repositories {
     mavenCentral()
@@ -78,7 +78,7 @@ publishing {
         mavenKotlin(MavenPublication) {
             groupId = "com.github.isyscore"
             artifactId = "common-jvm"
-            version = "3.0.0.1"
+            version = "3.0.0.2"
             from components.java
             artifact sourcesJar
             artifact javadocJar
