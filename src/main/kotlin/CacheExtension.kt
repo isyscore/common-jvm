@@ -1,9 +1,10 @@
-@file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST", "unused")
+@file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST", "unused", "DuplicatedCode")
 
 package com.isyscore.kotlin.common
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.TimeUnit
 
 private val cacheMap = mutableMapOf<Long, Cache<String, Any>>()
@@ -31,6 +32,23 @@ object Cache {
         }
         item = loader()
         c.put(key, item)
+        return item
+    }
+
+    suspend fun<T> asyncGet(key: String, expiresMillis: Long = 5 * 60 * 1000, loader: suspend CoroutineScope.() -> T): T {
+        var c = cacheMap[expiresMillis]
+        if (c == null) {
+            c = CacheBuilder<String, Any>.newBuilder().expireAfterWrite(expiresMillis, TimeUnit.MILLISECONDS).build()
+            cacheMap[expiresMillis] = c
+        }
+        var item = c.getIfPresent(key) as? T
+        if (item != null) {
+            return item
+        }
+        item = goWith(block = loader)
+        if (item != null) {
+            c.put(key, item)
+        }
         return item
     }
 
