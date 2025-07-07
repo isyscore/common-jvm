@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.isyscore.kotlin.common
 
 import com.fasterxml.jackson.annotation.JsonInclude

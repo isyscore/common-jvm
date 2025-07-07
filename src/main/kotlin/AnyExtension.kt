@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "UNCHECKED_CAST")
 
 package com.isyscore.kotlin.common
 
