@@ -15,6 +15,7 @@ import org.ktorm.logging.LogLevel
 import org.ktorm.schema.*
 import java.lang.reflect.Field
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.sql.ResultSet
 import java.sql.Time
 import java.sql.Timestamp
@@ -32,17 +33,27 @@ import kotlin.reflect.jvm.jvmErasure
 val logger = ConsoleLogger(LogLevel.ERROR)
 
 /**
+ * 分页计算
+ */
+infix fun Int.`#`(size: Int): Int = if (size == 0) 0 else (this / size) + if (this % size == 0) 0 else 1
+infix fun Long.`#`(size: Long): Long = if (size == 0L) 0L else (this / size) + if (this % size == 0L) 0 else 1
+infix fun BigInteger.`#`(size: BigInteger): BigInteger = if (size == BigInteger.ZERO) BigInteger.ZERO else {
+    val arr = this.divideAndRemainder(size)
+    if (arr[1] == BigInteger.ZERO) arr[0] else arr[0].add(BigInteger.ONE)
+}
+
+/**
  * 使用 Druid 建立连接池
  */
 fun databasePoolOf(
     driverClass: String, jdbcUrl: String, user: String, password: String, dialect: SqlDialect,
     logLevel: LogLevel = LogLevel.INFO, validationQuery: String = "select 1;",
-    maxActive: Int = 20,  minIdle: Int = 10, initSize: Int = 0, maxWait: Long = 10000L,
+    maxActive: Int = 20, minIdle: Int = 10, initSize: Int = 0, maxWait: Long = 10000L,
     connTimeout: Int = 10, queryTimeout: Int = 30, socketTimeout: Int = 60, removeAbandonedTimeout: Int = 30
-    ): Pair<Database?, Throwable?> {
+): Pair<Database?, Throwable?> {
     try {
-
-        val prop = mutableMapOf("driverClassName" to driverClass,
+        val prop = mutableMapOf(
+            "driverClassName" to driverClass,
             "url" to jdbcUrl,
             "username" to user,
             "password" to password,
@@ -305,6 +316,7 @@ fun <E : Entity<E>> ResultSet.retrieveColumn(column: Column<*>, intoEntity: E) {
                     it.free()
                 }
             }
+
             MonthDaySqlType -> intoEntity[propName] = this.getString(column.name)?.let { MonthDay.parse(it, formatterMonthDay) }
             YearMonthSqlType -> intoEntity[propName] = this.getString(column.name)?.let { YearMonth.parse(it, formatterYearMonth) }
             YearSqlType -> intoEntity[propName] = Year.of(this.getInt(column.name))
@@ -503,7 +515,7 @@ fun <E : Entity<E>> AssignmentsBuilder.setEntityColumns(columns: Collection<Colu
             if (skipFields.contains(t.name)) continue
             val v = value[t.name]
             if (v == null && !fillNull) continue
-            when(t.returnType.jvmErasure) {
+            when (t.returnType.jvmErasure) {
                 Boolean::class -> set(col as Column<Boolean>, v as? Boolean)
                 Int::class -> set(col as Column<Int>, v as? Int)
                 Short::class -> set(col as Column<Short>, v as? Short)
@@ -538,7 +550,7 @@ fun <E : Any> AssignmentsBuilder.setDataColumns(columns: Collection<Column<*>>, 
             if (skipFields.contains(t.name)) continue
             val v = value.iGet(t.name)
             if (v == null && !fillNull) continue
-            when(t.returnType.jvmErasure) {
+            when (t.returnType.jvmErasure) {
                 Boolean::class -> set(col as Column<Boolean>, v as? Boolean)
                 Int::class -> set(col as Column<Int>, v as? Int)
                 Short::class -> set(col as Column<Short>, v as? Short)
