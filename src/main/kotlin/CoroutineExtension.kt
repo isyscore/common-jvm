@@ -3,6 +3,10 @@
 package com.isyscore.kotlin.common
 
 import kotlinx.coroutines.*
+import okhttp3.internal.wait
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 @DslMarker
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPEALIAS, AnnotationTarget.TYPE, AnnotationTarget.FUNCTION)
@@ -118,4 +122,37 @@ suspend fun <T> goWith(timeoutMillis: Long, dispatcher: CoroutineDispatcher = Di
     }
     job.join()
     return result
+}
+
+@KtDsl
+fun <T> goSync(dispatcher: CoroutineDispatcher = Dispatchers.IO, block: suspend CoroutineScope.() -> T): T {
+    val future = CompletableFuture<T>()
+    val scope = CoroutineScope(dispatcher)
+    scope.launch {
+        try {
+            future.complete(block())
+        } catch (e: Exception) {
+            future.completeExceptionally(e)
+        }
+    }
+    return future.get()
+}
+
+@KtDsl
+fun <T> goSync(timeoutMillis: Long, dispatcher: CoroutineDispatcher = Dispatchers.IO, block: suspend CoroutineScope.() -> T?): T? {
+    val future = CompletableFuture<T>()
+    val scope = CoroutineScope(dispatcher)
+    val job = scope.launch {
+        try {
+            future.complete(block())
+        } catch (e: Throwable) {
+            future.completeExceptionally(e)
+        }
+    }
+    return try{
+        future.get(timeoutMillis, TimeUnit.MILLISECONDS)
+    } catch (e: Throwable) {
+        job.cancel()
+        null
+    }
 }

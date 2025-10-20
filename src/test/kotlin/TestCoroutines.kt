@@ -1,5 +1,5 @@
-
 import com.isyscore.kotlin.common.go
+import com.isyscore.kotlin.common.goSync
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.junit.Test
@@ -49,10 +49,10 @@ class TestCoroutines {
         }
     }
 
-    suspend fun<T> Any.gInvokeSuspend(name: String, vararg params: Any): T? {
+    suspend fun <T> Any.gInvokeSuspend(name: String, vararg params: Any): T? {
         val pparam = params.map { it::class.qualifiedName ?: "kotlin.Any" }
         val func = this::class.declaredFunctions.firstOrNull { f ->
-            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString()} == pparam
+            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString() } == pparam
         }?.apply { isAccessible = true } ?: return null
         return func.callSuspend(this, *params) as? T
     }
@@ -60,7 +60,7 @@ class TestCoroutines {
     suspend fun Any.iInvokeSuspend(name: String, vararg params: Any): Any? {
         val pparam = params.map { it::class.qualifiedName ?: "kotlin.Any" }
         val func = this::class.declaredFunctions.firstOrNull { f ->
-            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString()} == pparam
+            f.name == name && f.isSuspend && f.parameters.drop(1).map { p -> p.type.toString() } == pparam
         }?.apply { isAccessible = true } ?: return null
         return func.callSuspend(this, *params)
     }
@@ -145,7 +145,7 @@ class TestCoroutines {
     }
 
     @Test
-    fun test4(){
+    fun test4() {
         val apis = listOf(::api1, ::api2, ::api3)
         runBlocking {
             val list = apis.map { api -> async { api() } }.awaitAll()
@@ -153,11 +153,51 @@ class TestCoroutines {
         }
     }
 
+    @Test
+    fun test5() {
+        val apis = listOf(::api1, ::api2, ::api3)
+        val start = System.currentTimeMillis()
+        val sum = goSync {
+            val list = apis.map { api ->
+                async {
+                    delay(2000)
+                    api()
+                }
+            }.awaitAll()
+            list.sum()
+        }
+        val end = System.currentTimeMillis()
+        println(end - start)
+        println(sum)
+    }
+
+    @Test
+    fun test6() {
+        val apis = listOf(::api1, ::api2, ::api3)
+        val start = System.currentTimeMillis()
+        val sum = goSync(timeoutMillis = 1000) {
+            val list = apis.map { api ->
+                async {
+                    api()
+                }
+            }.awaitAll()
+            list.sum()
+        }
+        val end = System.currentTimeMillis()
+        println(end - start)
+        println(sum)
+
+    }
+
+
 }
 
-fun api1(): Int = 0
-fun api2(): Int = 0
-fun api3(): Int = 0
+fun api1(): Int = 1
+fun api2(): Int {
+    // throw RuntimeException("666")
+    return 2
+}
+fun api3(): Int = 3
 
 fun log(msg: String): Unit = println(msg)
 fun log(msg: Int): Unit = println(msg)

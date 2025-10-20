@@ -1,6 +1,7 @@
 /**
  * to relaase a new library, just do this:
- * gradle clean publish jreleaserDeploy
+ * $ gradle clean publishMavenKotlinPublicationToPreDeployRepository
+ * $ gradle publish jreleaserDeploy
  */
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -18,7 +19,7 @@ plugins {
 }
 
 group = "com.github.isyscore"
-version = "3.0.0.5"
+version = "3.0.0.6"
 
 repositories {
     mavenCentral()
