@@ -168,6 +168,7 @@ private class HttpSSEOperations {
 
             override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
                 util._fail(t)
+                inProgress = false
             }
         })
         while (inProgress) {

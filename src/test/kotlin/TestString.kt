@@ -1,3 +1,4 @@
+import com.isyscore.kotlin.common.extension
 import com.isyscore.kotlin.common.go
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -25,6 +26,11 @@ class TestString {
     fun testCollect() {
         val m = mutableMapOf("a" to 1, "b" to 2, "c" to 3)
         val f = File("").readBytes()
+    }
+
+    @Test
+    fun testExtension() {
+        println("a.txt".extension())
     }
 }
 
