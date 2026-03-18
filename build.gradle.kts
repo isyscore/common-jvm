@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "com.github.isyscore"
-version = "3.0.0.7"
+version = "3.0.0.8"
 
 repositories {
     mavenCentral()

@@ -33,16 +33,6 @@ import kotlin.reflect.jvm.jvmErasure
 val logger = ConsoleLogger(LogLevel.ERROR)
 
 /**
- * 分页计算
- */
-infix fun Int.`#`(size: Int): Int = if (size == 0) 0 else (this / size) + if (this % size == 0) 0 else 1
-infix fun Long.`#`(size: Long): Long = if (size == 0L) 0L else (this / size) + if (this % size == 0L) 0 else 1
-infix fun BigInteger.`#`(size: BigInteger): BigInteger = if (size == BigInteger.ZERO) BigInteger.ZERO else {
-    val arr = this.divideAndRemainder(size)
-    if (arr[1] == BigInteger.ZERO) arr[0] else arr[0].add(BigInteger.ONE)
-}
-
-/**
  * 使用 Druid 建立连接池
  */
 fun databasePoolOf(
